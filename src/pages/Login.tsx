@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -66,10 +66,14 @@ export default function Login() {
 
         // Salva informações do usuário
         localStorage.setItem("userEmail", email.trim());
+        
+        // Busca o nome do usuário do perfil
+        const userName = data.user.user_metadata?.name || data.user.user_metadata?.display_name || email.trim().split("@")[0];
+        localStorage.setItem("userName", userName);
 
         toast({
           title: "Login realizado com sucesso!",
-          description: "Bem-vindo ao Sistema de Gestão VANDE",
+          description: `Bem-vindo, ${userName}!`,
         });
 
         // Redireciona para dashboard
@@ -244,6 +248,16 @@ export default function Login() {
                 </>
               )}
             </Button>
+
+            <div className="text-center text-sm text-muted-foreground">
+              Não tem uma conta?{" "}
+              <Link
+                to="/register"
+                className="text-primary hover:underline font-medium"
+              >
+                Criar conta
+              </Link>
+            </div>
           </form>
         </CardContent>
       </Card>

@@ -22,6 +22,7 @@ import Aplicacoes from "./pages/Aplicacoes";
 import Faturamento from "./pages/Faturamento";
 import ImportData from "./pages/ImportData";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
@@ -42,6 +43,7 @@ const App = () => (
           <Routes>
             {/* Rotas públicas */}
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             
             {/* Rotas protegidas */}

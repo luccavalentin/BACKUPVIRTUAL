@@ -66,6 +66,7 @@ const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => {
       // Limpa dados locais
       localStorage.removeItem("rememberMe");
       localStorage.removeItem("userEmail");
+      localStorage.removeItem("userName");
       
       // Fecha menu mobile se estiver aberto
       if (onNavigate) {
@@ -117,6 +118,9 @@ const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => {
   // Verifica se o menu deve ser destacado (ativo ou quando está aberto e foi clicado)
   const shouldHighlightFinanceiro = isFinanceiroActive || (isFinanceiroClicked && isFinanceiroOpen);
 
+  // Busca nome do usuário
+  const userName = localStorage.getItem("userName") || "Usuário";
+
   return (
     <div className="flex flex-col h-full">
         <div className="p-5 border-b border-sidebar-border/50 bg-sidebar-primary/10">
@@ -131,6 +135,9 @@ const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => {
                 <h1 className="text-base font-bold text-sidebar-foreground tracking-tight leading-tight">
                   Sistema de Gestão VANDE
                 </h1>
+                <p className="text-xs text-sidebar-foreground/70 truncate">
+                  Olá, {userName}
+                </p>
               </div>
             </div>
             <div className="flex-shrink-0">
@@ -278,6 +285,9 @@ export function AppSidebar() {
                 <h1 className="text-sm font-bold text-sidebar-foreground tracking-tight leading-tight truncate">
                   Sistema de Gestão VANDE
                 </h1>
+                <p className="text-xs text-sidebar-foreground/70 truncate">
+                  {localStorage.getItem("userName") || "Usuário"}
+                </p>
               </div>
             </div>
             

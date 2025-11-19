@@ -26,6 +26,15 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
         
         if (session || rememberMe) {
           setIsAuthenticated(true);
+          
+          // Atualiza nome do usuário se não estiver salvo
+          if (session?.user && !localStorage.getItem("userName")) {
+            const userName = session.user.user_metadata?.name || 
+                           session.user.user_metadata?.display_name || 
+                           session.user.email?.split("@")[0] || 
+                           "Usuário";
+            localStorage.setItem("userName", userName);
+          }
         } else {
           setIsAuthenticated(false);
         }
@@ -42,6 +51,16 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     // Escuta mudanças na autenticação
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsAuthenticated(!!session);
+      
+      // Atualiza nome do usuário quando a sessão muda
+      if (session?.user) {
+        const userName = session.user.user_metadata?.name || 
+                       session.user.user_metadata?.display_name || 
+                       session.user.email?.split("@")[0] || 
+                       "Usuário";
+        localStorage.setItem("userName", userName);
+      }
+      
       setIsLoading(false);
     });
 
