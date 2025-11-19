@@ -3005,30 +3005,38 @@ export default function Dashboard() {
                   />
                   <Legend 
                     verticalAlign="bottom"
-                    height={window.innerWidth < 640 ? 24 : 36}
+                    height={window.innerWidth < 640 ? 36 : 48}
                     iconType="circle"
                     wrapperStyle={{
-                      paddingTop: window.innerWidth < 640 ? '8px' : '20px',
-                      fontSize: window.innerWidth < 640 ? '10px' : '14px',
+                      paddingTop: window.innerWidth < 640 ? '12px' : '20px',
+                      fontSize: window.innerWidth < 640 ? '11px' : '13px',
                       fontWeight: '500',
-                      overflowX: 'auto',
-                      whiteSpace: 'nowrap',
-                      display: 'block',
-                      maxWidth: '100%'
+                      display: 'flex',
+                      justifyContent: 'center',
+                      gap: '16px',
+                      flexWrap: 'wrap',
+                      width: '100%'
                     }}
-                    formatter={(value) => (
-                      <span style={{
-                        color: value === 'Receitas' ? 'hsl(var(--success))' : 'hsl(var(--destructive))',
-                        fontWeight: '600',
-                        wordBreak: 'break-word',
-                        fontSize: window.innerWidth < 640 ? '10px' : '14px',
-                        maxWidth: window.innerWidth < 640 ? '80px' : '120px',
-                        display: 'inline-block',
-                        overflowWrap: 'break-word'
-                      }}>
-                        {value}
-                      </span>
-                    )}
+                    formatter={(value, entry: any) => {
+                      const data = entry.payload;
+                      const formattedValue = formatCurrency(data.value || 0);
+                      return (
+                        <span style={{
+                          color: value === 'Receitas' ? 'hsl(var(--success))' : 'hsl(var(--destructive))',
+                          fontWeight: '600',
+                          fontSize: window.innerWidth < 640 ? '11px' : '13px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          whiteSpace: 'normal',
+                          wordBreak: 'break-word',
+                          lineHeight: '1.4'
+                        }}>
+                          <span>{value}:</span>
+                          <span style={{ fontWeight: '700' }}>{formattedValue}</span>
+                        </span>
+                      );
+                    }}
                   />
                 </PieChart>
               </ResponsiveContainer>

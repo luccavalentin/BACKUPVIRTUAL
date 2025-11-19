@@ -20,7 +20,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useTableSort } from "@/hooks/useTableSort";
 import { useSmartSearch } from "@/hooks/useSmartSearch";
 import { SmartSearchInput } from "@/components/SmartSearchInput";
-import { BankSearchInput } from "@/components/BankSearchInput";
 import { Pencil, Trash2, Download, DollarSign, TrendingUp, TrendingDown, Clock, CheckCircle2, FileText } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -55,13 +54,10 @@ export default function Emprestimos() {
   const queryClient = useQueryClient();
 
   const [formData, setFormData] = useState({
+    title: "",
     description: "",
     amount: "",
     type: "Empréstimo",
-    link_type: "Banco",
-    linked_bank: "",
-    linked_client_id: "",
-    linked_custom: "",
     status: "Ativo",
     due_date: "",
     installments: "1",
@@ -182,44 +178,19 @@ export default function Emprestimos() {
     });
   };
 
-  const { data: clients } = useQuery({
-    queryKey: ["clients"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("clients").select("id, name").order("name");
-      if (error) throw error;
-      return data;
-    },
-  });
-
-
   const handleSubmitLogic = async () => {
-    // Determinar o valor do link_type baseado na seleção
-    let linkTypeValue = formData.link_type;
-    let linkedValue = null;
-    
-    if (formData.link_type === "Banco") {
-      linkedValue = formData.linked_bank || null;
-    } else if (formData.link_type === "Cliente" || formData.link_type === "Fornecedor") {
-      linkedValue = formData.linked_client_id || null;
-    } else if (formData.link_type === "Outros") {
-      linkedValue = formData.linked_custom || null;
-    }
-    
     const amountNumber = formData.amount ? parseFloat(String(formData.amount).replace(",", ".")) : 0;
     const installmentsCount = Math.max(1, parseInt(formData.installments || "1", 10));
     const firstInstallmentDate =
       formData.first_installment_date || formData.due_date || format(new Date(), "yyyy-MM-dd");
 
     const data = {
-      description: formData.description ? standardizeText(formData.description) : "",
+      description: formData.title 
+        ? standardizeText(`${formData.title}${formData.description ? ` - ${formData.description}` : ""}`)
+        : (formData.description ? standardizeText(formData.description) : ""),
       amount: amountNumber,
       type: formData.type,
-      link_type: linkTypeValue,
-      linked_client_id:
-        formData.link_type === "Cliente" || formData.link_type === "Fornecedor" ? linkedValue : null,
       due_date: formData.due_date || null,
-      linked_bank: formData.link_type === "Banco" ? linkedValue : null,
-      linked_custom: formData.link_type === "Outros" ? linkedValue : null,
       status: formData.status || "Ativo",
     };
 
@@ -231,7 +202,7 @@ export default function Emprestimos() {
         totalAmount: amountNumber,
         firstDate: firstInstallmentDate,
         type: formData.type,
-        linkedClientId: formData.linked_client_id || null,
+        linkedClientId: null,
       };
       await createMutation.mutateAsync({ loanData: data, scheduleConfig });
     }
@@ -346,7 +317,6 @@ export default function Emprestimos() {
       const tableData = loans.map((loan: any) => [
         loan.description || "",
         loan.type === "loan_given" ? "Empréstimo Dado" : loan.type === "loan_received" ? "Empréstimo Recebido" : loan.type || "",
-        loan.clients?.name || loan.linked_bank || loan.linked_custom || "",
         loan.amount ? formatCurrency(loan.amount) : "",
         loan.status || "",
         loan.due_date ? format(new Date(loan.due_date), "dd/MM/yyyy", { locale: ptBR }) : "",
@@ -354,7 +324,7 @@ export default function Emprestimos() {
 
       autoTable(doc, {
         startY: yPosition,
-        head: [["Descrição", "Tipo", "Vinculado a", "Valor", "Status", "Data Vencimento"]],
+        head: [["Descrição", "Tipo", "Valor", "Status", "Data Vencimento"]],
         body: tableData,
         theme: "striped",
         headStyles: { fillColor: [33, 150, 243], textColor: 255, fontStyle: "bold" },
@@ -391,8 +361,6 @@ export default function Emprestimos() {
     const data = loans.map((loan: any) => ({
       Descrição: loan.description || "",
       Tipo: loan.type === "loan_given" ? "Empréstimo Dado" : loan.type === "loan_received" ? "Empréstimo Recebido" : loan.type || "",
-      "Tipo de Vínculo": loan.link_type || "",
-      "Vinculado a": loan.clients?.name || loan.linked_bank || loan.linked_custom || "",
       Valor: loan.amount ? formatCurrency(loan.amount) : "",
       Status: loan.status || "",
       "Data de Vencimento": loan.due_date ? format(new Date(loan.due_date), "dd/MM/yyyy", { locale: ptBR }) : "",
@@ -435,14 +403,17 @@ export default function Emprestimos() {
 
   const handleEdit = (loan: any) => {
     setEditingId(loan.id);
+    // Extrair título e descrição se houver separador " - "
+    const desc = loan.description || "";
+    const parts = desc.split(" - ");
+    const title = parts.length > 1 ? parts[0] : "";
+    const description = parts.length > 1 ? parts.slice(1).join(" - ") : desc;
+    
     setFormData({
-      description: loan.description,
+      title: title,
+      description: description,
       amount: loan.amount.toString(),
       type: loan.type || "Empréstimo",
-      link_type: loan.link_type || "Banco",
-      linked_bank: loan.linked_bank || "",
-      linked_client_id: loan.linked_client_id || "",
-      linked_custom: loan.linked_custom || "",
       status: loan.status || "Ativo",
       due_date: loan.due_date || "",
       installments: loan.installments ? String(loan.installments) : "1",
@@ -455,13 +426,10 @@ export default function Emprestimos() {
     setIsDialogOpen(false);
     setEditingId(null);
     setFormData({
+      title: "",
       description: "",
       amount: "",
       type: "Empréstimo",
-      link_type: "Banco",
-      linked_bank: "",
-      linked_client_id: "",
-      linked_custom: "",
       status: "Ativo",
       due_date: "",
       installments: "1",
@@ -472,13 +440,10 @@ export default function Emprestimos() {
   const handleNewItem = () => {
     setEditingId(null);
     setFormData({
+      title: "",
       description: "",
       amount: "",
       type: "Empréstimo",
-      link_type: "Banco",
-      linked_bank: "",
-      linked_client_id: "",
-      linked_custom: "",
       status: "Ativo",
       due_date: "",
       installments: "1",
@@ -625,13 +590,11 @@ export default function Emprestimos() {
         className="bg-card rounded-2xl shadow-elegant-lg border border-border/50"
         contentClassName="overflow-x-auto"
       >
-        <Table className="w-full border-separate border-spacing-0 min-w-[1200px]">
+        <Table className="w-full border-separate border-spacing-0 min-w-[800px]">
           <TableHeader>
             <TableRow className="border-b-2 border-destructive/30 hover:bg-transparent">
               <TableHead className="bg-gradient-to-r from-destructive/10 to-destructive/5 backdrop-blur-sm font-bold border-r border-border/50 rounded-tl-xl px-1.5 sm:px-2 text-xs text-center">Descrição</TableHead>
               <TableHead className="bg-gradient-to-r from-destructive/10 to-destructive/5 backdrop-blur-sm font-bold border-r border-border/50 px-1.5 sm:px-2 text-xs text-center">Tipo</TableHead>
-              <TableHead className="bg-gradient-to-r from-destructive/10 to-destructive/5 backdrop-blur-sm font-bold border-r border-border/50 px-1.5 sm:px-2 text-xs text-center">Vinculação</TableHead>
-              <TableHead className="bg-gradient-to-r from-destructive/10 to-destructive/5 backdrop-blur-sm font-bold border-r border-border/50 px-1.5 sm:px-2 text-xs text-center">Vinculado a</TableHead>
               <TableHead className="bg-gradient-to-r from-destructive/10 to-destructive/5 backdrop-blur-sm font-bold border-r border-border/50 px-1.5 sm:px-2 text-xs text-center">Status</TableHead>
               <TableHead className="bg-gradient-to-r from-destructive/10 to-destructive/5 backdrop-blur-sm font-bold border-r border-border/50 px-1.5 sm:px-2 text-xs text-center">Vencimento</TableHead>
               <TableHead className="bg-gradient-to-r from-destructive/10 to-destructive/5 backdrop-blur-sm font-bold border-r border-border/50 px-1.5 sm:px-2 text-xs text-center">Valor</TableHead>
@@ -641,7 +604,7 @@ export default function Emprestimos() {
           <TableBody>
             {sortedLoans?.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-12 text-muted-foreground/70 border-0">
+                <TableCell colSpan={6} className="text-center py-12 text-muted-foreground/70 border-0">
                   <div className="flex flex-col items-center gap-2">
                     <div className="w-16 h-16 rounded-full bg-muted/30 border-2 border-border/50 flex items-center justify-center">
                       <span className="text-2xl">💳</span>
@@ -653,15 +616,8 @@ export default function Emprestimos() {
             ) : (
               sortedLoans?.map((loan, index) => (
                 <TableRow key={loan.id} className={`border-b border-border/30 hover:bg-muted/20 transition-colors ${index % 2 === 0 ? "bg-card" : "bg-muted/5"}`}>
-                  <TableCell className="font-semibold text-foreground max-w-[120px] truncate border-r border-border/30 px-1.5 sm:px-2 text-xs text-center">{loan.description}</TableCell>
+                  <TableCell className="font-semibold text-foreground max-w-[200px] truncate border-r border-border/30 px-1.5 sm:px-2 text-xs text-center">{loan.description}</TableCell>
                   <TableCell className="font-medium text-foreground border-r border-border/30 px-1.5 sm:px-2 text-xs whitespace-nowrap text-center">{loan.type}</TableCell>
-                  <TableCell className="font-medium text-foreground border-r border-border/30 px-1.5 sm:px-2 text-xs whitespace-nowrap text-center">{loan.link_type || "-"}</TableCell>
-                  <TableCell className="font-medium text-foreground border-r border-border/30 px-1.5 sm:px-2 text-xs max-w-[100px] truncate text-center">
-                    {loan.link_type === "Banco" && (loan.linked_bank || "-")}
-                    {(loan.link_type === "Cliente" || loan.link_type === "Fornecedor") && (loan.clients?.name || "-")}
-                    {loan.link_type === "Outros" && (loan.linked_custom || "-")}
-                    {!loan.link_type && "-"}
-                  </TableCell>
                   <TableCell className="border-r border-border/30 px-1.5 sm:px-2 text-xs text-center">
                     <span className={`px-1.5 py-0.5 rounded text-xs font-semibold shadow-sm whitespace-nowrap ${getStatusColor(loan.status || "")} ${
                       loan.status === "Ativo" ? "bg-success/20" :
@@ -739,6 +695,17 @@ export default function Emprestimos() {
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
+              <Label htmlFor="title">Título *</Label>
+              <Input
+                id="title"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                onBlur={(e) => handleStandardizeInput(e.target.value, (value) => setFormData({ ...formData, title: value }))}
+                placeholder="Ex: Empréstimo Banco X"
+                required
+              />
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="description">Descrição</Label>
               <Textarea
                 id="description"
@@ -746,6 +713,7 @@ export default function Emprestimos() {
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 onBlur={(e) => handleStandardizeInput(e.target.value, (value) => setFormData({ ...formData, description: value }))}
                 rows={2}
+                placeholder="Detalhes adicionais sobre o empréstimo..."
               />
             </div>
 
@@ -797,80 +765,6 @@ export default function Emprestimos() {
                   Usaremos esta data para lançar receitas ou despesas automaticamente.
                 </p>
               </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="link_type">Vinculação</Label>
-                <Select 
-                  value={formData.link_type} 
-                  onValueChange={(value) => {
-                    setFormData({ 
-                      ...formData, 
-                      link_type: value,
-                      linked_bank: "",
-                      linked_client_id: "",
-                      linked_custom: "",
-                    });
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-popover z-50">
-                    <SelectItem value="Banco">Banco</SelectItem>
-                    <SelectItem value="Cliente">Cliente</SelectItem>
-                    <SelectItem value="Fornecedor">Fornecedor</SelectItem>
-                    <SelectItem value="Outros">Outros</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {formData.link_type === "Banco" && (
-                <div className="space-y-2">
-                  <Label htmlFor="linked_bank">Banco/IF</Label>
-                  <BankSearchInput
-                    value={formData.linked_bank}
-                    onChange={(value) => setFormData({ ...formData, linked_bank: value })}
-                    placeholder="Buscar banco ou IF..."
-                  />
-                </div>
-              )}
-
-              {(formData.link_type === "Cliente" || formData.link_type === "Fornecedor") && (
-                <div className="space-y-2">
-                  <Label htmlFor="linked_client_id">
-                    {formData.link_type === "Cliente" ? "Cliente" : "Fornecedor"}
-                  </Label>
-                  <Select 
-                    value={formData.linked_client_id} 
-                    onValueChange={(value) => setFormData({ ...formData, linked_client_id: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-popover z-50">
-                      {clients?.map((client) => (
-                        <SelectItem key={client.id} value={client.id}>
-                          {client.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-
-              {formData.link_type === "Outros" && (
-                <div className="space-y-2">
-                  <Label htmlFor="linked_custom">Descrição</Label>
-                  <Input
-                    id="linked_custom"
-                    value={formData.linked_custom}
-                    onChange={(e) => setFormData({ ...formData, linked_custom: e.target.value })}
-                    placeholder="Digite a descrição da vinculação..."
-                  />
-                </div>
-              )}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">

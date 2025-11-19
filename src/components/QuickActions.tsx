@@ -34,25 +34,34 @@ export const QuickActions = () => {
   ];
 
   return (
-    <Card className="mb-6 shadow-lg rounded-2xl border-0 bg-gradient-to-br from-white to-slate-100">
-      <CardHeader>
-        <CardTitle className="text-lg font-bold tracking-tight text-primary">Ações Rápidas</CardTitle>
+    <Card className="mb-6 shadow-elegant rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base font-semibold tracking-tight text-foreground">Ações Rápidas</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {actions.map((action) => {
             const Icon = action.icon;
             return (
               <Button
                 key={action.label}
                 variant="ghost"
-                className={`flex flex-col items-center justify-center gap-2 h-auto py-5 rounded-xl shadow-md transition-all duration-200 hover:scale-105 hover:shadow-xl focus:ring-2 focus:ring-primary/40 ${action.color}`}
+                className={`
+                  flex flex-col items-center justify-center gap-2 
+                  h-auto py-4 px-3 rounded-lg 
+                  border border-border/30 
+                  transition-all duration-200 
+                  hover:scale-[1.02] hover:shadow-md 
+                  active:scale-[0.98]
+                  focus:ring-2 focus:ring-primary/30 
+                  ${action.color}
+                `}
                 onClick={action.onClick}
               >
-                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-white shadow-inner mb-2">
-                  <Icon className="w-7 h-7 text-primary" />
+                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-background/80 shadow-sm">
+                  <Icon className="w-5 h-5 text-foreground" />
                 </div>
-                <span className="text-sm font-medium text-primary text-center">{action.label}</span>
+                <span className="text-xs font-medium text-foreground text-center leading-tight">{action.label}</span>
               </Button>
             );
           })}
