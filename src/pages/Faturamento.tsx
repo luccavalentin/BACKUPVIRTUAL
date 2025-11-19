@@ -477,8 +477,8 @@ export default function Faturamento() {
             `}</style>
             <Table className="w-full min-w-max text-xs sm:text-sm border-separate border-spacing-0 min-w-[1200px]">
             <TableHeader>
-              <TableRow className="border-b-2 border-primary/30 hover:bg-transparent">
-                <TableHead className="sticky left-0 z-10 bg-gradient-to-r from-muted/40 to-muted/30 backdrop-blur-sm min-w-[60px] sm:min-w-[75px] md:min-w-[100px] max-w-[60px] sm:max-w-[75px] md:max-w-[100px] text-center text-xs sm:text-sm px-2 sm:px-4 font-bold border-r border-border/50 rounded-tl-xl">
+              <TableRow className="border-b-2 border-primary/30 hover:bg-transparent bg-primary">
+                <TableHead className="sticky left-0 z-10 bg-primary text-primary-foreground min-w-[60px] sm:min-w-[75px] md:min-w-[100px] max-w-[60px] sm:max-w-[75px] md:max-w-[100px] text-center text-xs sm:text-sm px-2 sm:px-4 font-bold border-r border-primary/50 rounded-tl-xl">
                   Descrição
                 </TableHead>
                 {months.map((month, index) => (
@@ -510,7 +510,7 @@ export default function Faturamento() {
                 <>
                   {billingData.map((item, index) => (
                     <TableRow key={item.category} className={`border-b border-border/30 hover:bg-muted/20 transition-colors ${index % 2 === 0 ? "bg-card" : "bg-muted/5"}`}>
-                      <TableCell className="font-semibold sticky left-0 z-10 bg-inherit text-xs sm:text-sm px-2 sm:px-4 border-r border-border/30 max-w-[60px] sm:max-w-[75px] md:max-w-[100px]">
+                      <TableCell className="font-semibold sticky left-0 z-10 bg-card text-xs sm:text-sm px-2 sm:px-4 border-r border-border/30 max-w-[60px] sm:max-w-[75px] md:max-w-[100px]">
                         <span className="block break-words whitespace-pre-wrap hyphens-auto leading-tight text-center text-foreground/90">
                           {formatCategoryLabel(item.category)}
                         </span>
@@ -534,20 +534,20 @@ export default function Faturamento() {
                       </TableCell>
                     </TableRow>
                   ))}
-                  <TableRow className="bg-gradient-to-r from-primary/15 via-primary/10 to-primary/5 font-bold border-t-2 border-primary/50 border-b-2 border-primary/30">
-                    <TableCell className="sticky left-0 z-10 bg-inherit font-bold border-r-2 border-primary/40 text-xs sm:text-sm px-2 sm:px-4 rounded-bl-xl text-center">
-                      <span className="text-foreground">TOTAL</span>
+                  <TableRow className="bg-primary font-bold border-t-2 border-primary/50 border-b-2 border-primary/30">
+                    <TableCell className="sticky left-0 z-10 bg-primary text-primary-foreground font-bold border-r-2 border-primary/40 text-xs sm:text-sm px-2 sm:px-4 rounded-bl-xl text-center">
+                      <span className="text-primary-foreground font-extrabold">TOTAL</span>
                     </TableCell>
                     {months.map((month) => (
                       <TableCell 
                         key={month.key} 
-                        className="text-center font-bold text-success text-xs sm:text-sm px-1 sm:px-2 border-r border-primary/20"
+                        className="text-center font-bold bg-primary text-primary-foreground text-xs sm:text-sm px-1 sm:px-2 border-r border-primary/20"
                       >
                         <span className="whitespace-nowrap">{formatCurrency(monthlyTotals[month.key] || 0)}</span>
                       </TableCell>
                     ))}
                     <TableCell className="text-center font-bold text-primary-foreground bg-primary border-l-2 border-primary/50 sticky right-0 z-10 text-xs sm:text-sm px-2 sm:px-4 rounded-br-xl" style={{ right: 0 }}>
-                      <span className="whitespace-nowrap">{formatCurrency(grandTotal)}</span>
+                      <span className="whitespace-nowrap font-extrabold">{formatCurrency(grandTotal)}</span>
                     </TableCell>
                   </TableRow>
                 </>

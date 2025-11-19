@@ -822,6 +822,7 @@ export default function Relatorios() {
                     const total = revenueByCategory ? revenueByCategory.reduce((sum: number, item: any) => sum + item.amount, 0) : 0;
                     const percent = data && total > 0 ? ((data.amount / total) * 100).toFixed(1) : '0';
                     const formattedValue = formatCurrency(data.amount || 0);
+                    const categoryName = value || "Sem categoria";
                     return (
                       <span style={{
                         fontSize: window.innerWidth < 640 ? '11px' : '13px',
@@ -834,9 +835,8 @@ export default function Relatorios() {
                         lineHeight: '1.5',
                         textAlign: 'center'
                       }}>
-                        <span>{value}:</span>
-                        <span style={{ fontWeight: '700' }}>{formattedValue}</span>
-                        <span style={{ fontWeight: '700', color: 'hsl(var(--muted-foreground))' }}>({percent}%)</span>
+                        <span>{percent}% de {categoryName}</span>
+                        <span style={{ fontWeight: '700', color: 'hsl(var(--muted-foreground))' }}>({formattedValue})</span>
                       </span>
                     );
                   }}
@@ -909,6 +909,7 @@ export default function Relatorios() {
                     const total = expensesByCategory ? expensesByCategory.reduce((sum: number, item: any) => sum + item.amount, 0) : 0;
                     const percent = data && total > 0 ? ((data.amount / total) * 100).toFixed(1) : '0';
                     const formattedValue = formatCurrency(data.amount || 0);
+                    const categoryName = value || "Sem categoria";
                     return (
                       <span style={{
                         fontSize: window.innerWidth < 640 ? '11px' : '13px',
@@ -921,9 +922,8 @@ export default function Relatorios() {
                         lineHeight: '1.5',
                         textAlign: 'center'
                       }}>
-                        <span>{value}:</span>
-                        <span style={{ fontWeight: '700' }}>{formattedValue}</span>
-                        <span style={{ fontWeight: '700', color: 'hsl(var(--muted-foreground))' }}>({percent}%)</span>
+                        <span>{percent}% de {categoryName}</span>
+                        <span style={{ fontWeight: '700', color: 'hsl(var(--muted-foreground))' }}>({formattedValue})</span>
                       </span>
                     );
                   }}

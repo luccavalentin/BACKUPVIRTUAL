@@ -2811,19 +2811,19 @@ export default function Dashboard() {
           </CardHeader>
             <CardContent className="overflow-visible pb-4 sm:pb-6">
               <div ref={comparisonPieChartRef1} className="w-full overflow-visible">
-                <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 300 : window.innerWidth < 768 ? 350 : 400} className="min-h-[300px] sm:min-h-[350px] md:min-h-[400px]">
-                <PieChart margin={{ top: 10, right: 10, bottom: window.innerWidth < 640 ? 80 : 70, left: 10 }}>
+                <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 320 : window.innerWidth < 768 ? 380 : 420} className="min-h-[320px] sm:min-h-[380px] md:min-h-[420px]">
+                <PieChart margin={{ top: window.innerWidth < 640 ? 20 : 30, right: 10, bottom: window.innerWidth < 640 ? 80 : 70, left: 10 }}>
                   <Pie
                 data={[
                       { name: "Receitas", value: comparisonRevenue1 || 0 },
                       { name: "Despesas", value: comparisonExpense1 || 0 },
                     ]}
                     cx="50%"
-                    cy={window.innerWidth < 640 ? "42%" : "45%"}
+                    cy={window.innerWidth < 640 ? "45%" : "48%"}
                     labelLine={false}
                     label={false}
-                    outerRadius={window.innerWidth < 640 ? 75 : window.innerWidth < 768 ? 90 : 110}
-                    innerRadius={window.innerWidth < 640 ? 35 : 45}
+                    outerRadius={window.innerWidth < 640 ? 70 : window.innerWidth < 768 ? 85 : 100}
+                    innerRadius={window.innerWidth < 640 ? 30 : 40}
                     fill="#8884d8"
                     dataKey="value"
                     paddingAngle={3}
@@ -3001,19 +3001,19 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent className="overflow-visible pb-4 sm:pb-6">
               <div ref={pieChartRef} className="w-full overflow-x-auto overflow-y-visible break-words sm:overflow-visible">
-                <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 300 : window.innerWidth < 768 ? 350 : 400} className="min-h-[300px] sm:min-h-[350px] md:min-h-[400px]">
-                <PieChart margin={{ top: 10, right: 10, bottom: window.innerWidth < 640 ? 80 : 70, left: 10 }}>
+                <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 320 : window.innerWidth < 768 ? 380 : 420} className="min-h-[320px] sm:min-h-[380px] md:min-h-[420px]">
+                <PieChart margin={{ top: window.innerWidth < 640 ? 20 : 30, right: 10, bottom: window.innerWidth < 640 ? 80 : 70, left: 10 }}>
                   <Pie
                     data={[
                       { name: "Receitas", value: revenueData || 0 },
                       { name: "Despesas", value: expensesData || 0 },
                     ]}
                     cx="50%"
-                    cy={window.innerWidth < 640 ? "42%" : "45%"}
+                    cy={window.innerWidth < 640 ? "45%" : "48%"}
                     labelLine={false}
                     label={false}
-                    outerRadius={window.innerWidth < 640 ? 75 : window.innerWidth < 768 ? 90 : 110}
-                    innerRadius={window.innerWidth < 640 ? 35 : 45}
+                    outerRadius={window.innerWidth < 640 ? 70 : window.innerWidth < 768 ? 85 : 100}
+                    innerRadius={window.innerWidth < 640 ? 30 : 40}
                     fill="#8884d8"
                     dataKey="value"
                     paddingAngle={3}
@@ -3255,22 +3255,24 @@ export default function Dashboard() {
                       }}
                       formatter={(value, entry: any) => {
                         const data = entry.payload;
-                        const percent = data && comparisonRevenueByCategory1 ? 
-                          ((data.amount / comparisonRevenueByCategory1.reduce((sum: number, item: any) => sum + item.amount, 0)) * 100).toFixed(1) : '0';
+                        const total = comparisonRevenueByCategory1 ? comparisonRevenueByCategory1.reduce((sum: number, item: any) => sum + item.amount, 0) : 0;
+                        const percent = data && total > 0 ? ((data.amount / total) * 100).toFixed(1) : '0';
+                        const formattedValue = formatCurrency(data.amount || 0);
+                        const categoryName = value || "Sem categoria";
                         return (
                           <span style={{
-                            fontSize: window.innerWidth < 640 ? '10px' : '12px',
-                            fontWeight: '500',
+                            fontSize: window.innerWidth < 640 ? '11px' : '13px',
+                            fontWeight: '600',
                             display: 'inline-flex',
                             alignItems: 'center',
-                            gap: '4px',
+                            gap: '6px',
                             whiteSpace: 'normal',
                             wordBreak: 'break-word',
-                            lineHeight: '1.4',
+                            lineHeight: '1.5',
                             textAlign: 'center'
                           }}>
-                            <span>{value}:</span>
-                            <span style={{ fontWeight: '700' }}>{percent}%</span>
+                            <span>{percent}% de {categoryName}</span>
+                            <span style={{ fontWeight: '700', color: 'hsl(var(--muted-foreground))' }}>({formattedValue})</span>
                           </span>
                         );
                       }}
@@ -3344,6 +3346,7 @@ export default function Dashboard() {
                         const total = comparisonExpensesByCategory1 ? comparisonExpensesByCategory1.reduce((sum: number, item: any) => sum + item.amount, 0) : 0;
                         const percent = data && total > 0 ? ((data.amount / total) * 100).toFixed(1) : '0';
                         const formattedValue = formatCurrency(data.amount || 0);
+                        const categoryName = value || "Sem categoria";
                         return (
                           <span style={{
                             fontSize: window.innerWidth < 640 ? '11px' : '13px',
@@ -3356,9 +3359,8 @@ export default function Dashboard() {
                             lineHeight: '1.5',
                             textAlign: 'center'
                           }}>
-                            <span>{value}:</span>
-                            <span style={{ fontWeight: '700' }}>{formattedValue}</span>
-                            <span style={{ fontWeight: '700', color: 'hsl(var(--muted-foreground))' }}>({percent}%)</span>
+                            <span>{percent}% de {categoryName}</span>
+                            <span style={{ fontWeight: '700', color: 'hsl(var(--muted-foreground))' }}>({formattedValue})</span>
                           </span>
                         );
                       }}
@@ -3435,6 +3437,7 @@ export default function Dashboard() {
                         const total = comparisonRevenueByCategory2 ? comparisonRevenueByCategory2.reduce((sum: number, item: any) => sum + item.amount, 0) : 0;
                         const percent = data && total > 0 ? ((data.amount / total) * 100).toFixed(1) : '0';
                         const formattedValue = formatCurrency(data.amount || 0);
+                        const categoryName = value || "Sem categoria";
                         return (
                           <span style={{
                             fontSize: window.innerWidth < 640 ? '11px' : '13px',
@@ -3447,9 +3450,8 @@ export default function Dashboard() {
                             lineHeight: '1.5',
                             textAlign: 'center'
                           }}>
-                            <span>{value}:</span>
-                            <span style={{ fontWeight: '700' }}>{formattedValue}</span>
-                            <span style={{ fontWeight: '700', color: 'hsl(var(--muted-foreground))' }}>({percent}%)</span>
+                            <span>{percent}% de {categoryName}</span>
+                            <span style={{ fontWeight: '700', color: 'hsl(var(--muted-foreground))' }}>({formattedValue})</span>
                           </span>
                         );
                       }}
@@ -3523,6 +3525,7 @@ export default function Dashboard() {
                         const total = comparisonExpensesByCategory2 ? comparisonExpensesByCategory2.reduce((sum: number, item: any) => sum + item.amount, 0) : 0;
                         const percent = data && total > 0 ? ((data.amount / total) * 100).toFixed(1) : '0';
                         const formattedValue = formatCurrency(data.amount || 0);
+                        const categoryName = value || "Sem categoria";
                         return (
                           <span style={{
                             fontSize: window.innerWidth < 640 ? '11px' : '13px',
@@ -3535,9 +3538,8 @@ export default function Dashboard() {
                             lineHeight: '1.5',
                             textAlign: 'center'
                           }}>
-                            <span>{value}:</span>
-                            <span style={{ fontWeight: '700' }}>{formattedValue}</span>
-                            <span style={{ fontWeight: '700', color: 'hsl(var(--muted-foreground))' }}>({percent}%)</span>
+                            <span>{percent}% de {categoryName}</span>
+                            <span style={{ fontWeight: '700', color: 'hsl(var(--muted-foreground))' }}>({formattedValue})</span>
                           </span>
                         );
                       }}
@@ -3615,6 +3617,7 @@ export default function Dashboard() {
                       const total = revenueByCategory ? revenueByCategory.reduce((sum: number, item: any) => sum + item.amount, 0) : 0;
                       const percent = data && total > 0 ? ((data.amount / total) * 100).toFixed(1) : '0';
                       const formattedValue = formatCurrency(data.amount || 0);
+                      const categoryName = value || "Sem categoria";
                       return (
                         <span style={{
                           fontSize: window.innerWidth < 640 ? '11px' : '13px',
@@ -3627,9 +3630,8 @@ export default function Dashboard() {
                           lineHeight: '1.5',
                           textAlign: 'center'
                         }}>
-                          <span>{value}:</span>
-                          <span style={{ fontWeight: '700' }}>{formattedValue}</span>
-                          <span style={{ fontWeight: '700', color: 'hsl(var(--muted-foreground))' }}>({percent}%)</span>
+                          <span>{percent}% de {categoryName}</span>
+                          <span style={{ fontWeight: '700', color: 'hsl(var(--muted-foreground))' }}>({formattedValue})</span>
                         </span>
                       );
                     }}
@@ -3704,6 +3706,7 @@ export default function Dashboard() {
                       const total = expensesByCategory ? expensesByCategory.reduce((sum: number, item: any) => sum + item.amount, 0) : 0;
                       const percent = data && total > 0 ? ((data.amount / total) * 100).toFixed(1) : '0';
                       const formattedValue = formatCurrency(data.amount || 0);
+                      const categoryName = value || "Sem categoria";
                       return (
                         <span style={{
                           fontSize: window.innerWidth < 640 ? '11px' : '13px',
@@ -3716,9 +3719,8 @@ export default function Dashboard() {
                           lineHeight: '1.5',
                           textAlign: 'center'
                         }}>
-                          <span>{value}:</span>
-                          <span style={{ fontWeight: '700' }}>{formattedValue}</span>
-                          <span style={{ fontWeight: '700', color: 'hsl(var(--muted-foreground))' }}>({percent}%)</span>
+                          <span>{percent}% de {categoryName}</span>
+                          <span style={{ fontWeight: '700', color: 'hsl(var(--muted-foreground))' }}>({formattedValue})</span>
                         </span>
                       );
                     }}
