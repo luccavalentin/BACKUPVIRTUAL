@@ -16,7 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useTableSort } from "@/hooks/useTableSort";
 import { useSmartSearch } from "@/hooks/useSmartSearch";
 import { SmartSearchInput } from "@/components/SmartSearchInput";
-import { Pencil, Trash2, TrendingDown, Copy, Download, FileText } from "lucide-react";
+import { Pencil, Trash2, TrendingDown, Download, FileText } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { standardizeText, handleStandardizeInput } from "@/lib/validations";
@@ -27,8 +27,6 @@ import autoTable from "jspdf-autotable";
 
 export default function Despesas() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isReuseDialogOpen, setIsReuseDialogOpen] = useState(false);
-  const [reuseSearchTerm, setReuseSearchTerm] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const { toast } = useToast();
@@ -61,12 +59,6 @@ export default function Despesas() {
     ["description", "category", "status"]
   );
 
-  // Busca para reutilizar despesas
-  const { filteredData: filteredReuseExpenses } = useSmartSearch(
-    expenses,
-    ["description", "category", "status"],
-    reuseSearchTerm
-  );
 
   const { sortedData: sortedExpenses, SortButton } = useTableSort(filteredExpenses);
 
@@ -166,12 +158,6 @@ export default function Despesas() {
       });
     },
   });
-
-  const handleSubmitAndNew = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setKeepDialogOpen(true);
-    await handleSubmitLogic();
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -358,78 +344,6 @@ export default function Despesas() {
     setIsDialogOpen(true);
   };
 
-  // Função para preencher formulário com despesa existente
-  const fillFormFromExpense = (expense: any) => {
-    const frequency = expense.frequency || "Única";
-    let frequency_type = "";
-    let installments = "";
-    
-    if (frequency.includes("Fixo")) {
-      frequency_type = "fixo";
-      if (frequency.includes("Mensal")) {
-        setFormData({
-          description: expense.description || "",
-          amount: expense.amount?.toString() || "",
-          date: new Date().toISOString().split('T')[0], // Data atual
-          category: expense.category || "",
-          frequency: "Mensal",
-          frequency_type: "fixo",
-          installments: "",
-          status: expense.status || "PENDENTE",
-        });
-      } else if (frequency.includes("Anual")) {
-        setFormData({
-          description: expense.description || "",
-          amount: expense.amount?.toString() || "",
-          date: new Date().toISOString().split('T')[0], // Data atual
-          category: expense.category || "",
-          frequency: "Anual",
-          frequency_type: "fixo",
-          installments: "",
-          status: expense.status || "PENDENTE",
-        });
-      }
-    } else if (frequency.includes("Tempo Determinado")) {
-      frequency_type = "tempo_determinado";
-      installments = expense.installments?.toString() || "";
-      if (frequency.includes("Mensal")) {
-        setFormData({
-          description: expense.description || "",
-          amount: expense.amount?.toString() || "",
-          date: new Date().toISOString().split('T')[0], // Data atual
-          category: expense.category || "",
-          frequency: "Mensal",
-          frequency_type: "tempo_determinado",
-          installments: installments,
-          status: expense.status || "PENDENTE",
-        });
-      } else if (frequency.includes("Anual")) {
-        setFormData({
-          description: expense.description || "",
-          amount: expense.amount?.toString() || "",
-          date: new Date().toISOString().split('T')[0], // Data atual
-          category: expense.category || "",
-          frequency: "Anual",
-          frequency_type: "tempo_determinado",
-          installments: installments,
-          status: expense.status || "PENDENTE",
-        });
-      }
-    } else {
-      setFormData({
-        description: expense.description || "",
-        amount: expense.amount?.toString() || "",
-        date: new Date().toISOString().split('T')[0], // Data atual
-        category: expense.category || "",
-        frequency: frequency,
-        frequency_type: "",
-        installments: "",
-        status: expense.status || "PENDENTE",
-      });
-    }
-    setIsReuseDialogOpen(false);
-    setIsDialogOpen(true);
-  };
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -755,18 +669,6 @@ export default function Despesas() {
               {editingId ? "Edite os dados da despesa abaixo." : "Preencha os dados para cadastrar uma nova despesa."}
             </DialogDescription>
           </DialogHeader>
-          {!editingId && (
-            <div className="mb-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsReuseDialogOpen(true)}
-                className="w-full"
-              >
-                <Copy className="w-4 h-4 mr-2" />
-              </Button>
-            </div>
-          )}
           <form onSubmit={(e) => { e.preventDefault(); handleSubmit(e); }} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
               <div className="space-y-2">
@@ -944,83 +846,11 @@ export default function Despesas() {
               <Button type="button" variant="outline" onClick={handleCloseDialog}>
                 Cancelar
               </Button>
-              {!editingId && (
-                <Button type="button" variant="outline" onClick={handleSubmitAndNew}>
-                </Button>
-              )}
               <Button type="submit">
                 {editingId ? "Atualizar" : "Cadastrar"}
               </Button>
             </div>
           </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Dialog para buscar e reutilizar despesas */}
-      <Dialog open={isReuseDialogOpen} onOpenChange={setIsReuseDialogOpen}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Buscar Despesa para Reutilizar</DialogTitle>
-            <DialogDescription>
-              Busque uma despesa já cadastrada para reutilizar seus dados no novo cadastro.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <SmartSearchInput
-                value={reuseSearchTerm}
-                onChange={setReuseSearchTerm}
-                placeholder="Buscar por descrição, categoria, status..."
-              />
-            </div>
-            <div className="bg-muted/20 rounded-lg max-h-[400px] overflow-y-auto shadow-sm">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Descrição</TableHead>
-                    <TableHead>Categoria</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Valor</TableHead>
-                    <TableHead className="text-right">Ação</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredReuseExpenses && filteredReuseExpenses.length > 0 ? (
-                    filteredReuseExpenses.map((expense: any) => (
-                      <TableRow key={expense.id}>
-                        <TableCell className="font-medium">{expense.description || "-"}</TableCell>
-                        <TableCell>{expense.category || "-"}</TableCell>
-                        <TableCell>{expense.status || "-"}</TableCell>
-                        <TableCell className="text-right text-destructive font-semibold">
-                          {new Intl.NumberFormat("pt-BR", {
-                            style: "currency",
-                            currency: "BRL",
-                          }).format(expense.amount || 0)}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => fillFormFromExpense(expense)}
-                          >
-                            <Copy className="w-4 h-4 mr-1" />
-                            Usar
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                        Nenhuma despesa encontrada
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </div>
         </DialogContent>
       </Dialog>
 

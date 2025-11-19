@@ -1954,23 +1954,33 @@ export default function Dashboard() {
                 <BarChart
                   data={sortedData}
                   layout="vertical"
-                  margin={{ top: 10, right: 30, left: 100, bottom: 10 }}
+                  margin={{ 
+                    top: 10, 
+                    right: window.innerWidth < 640 ? 10 : 30, 
+                    left: window.innerWidth < 640 ? 70 : 100, 
+                    bottom: 10 
+                  }}
                 >
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
                   <XAxis 
                     type="number" 
                     tickFormatter={(value) => formatCurrency(value)}
                     stroke="hsl(var(--muted-foreground))"
-                    fontSize={12}
+                    fontSize={window.innerWidth < 640 ? 10 : 12}
                     tick={{ fill: 'hsl(var(--muted-foreground))' }}
                   />
                   <YAxis 
                     type="category" 
                     dataKey="category" 
-                    width={90}
-                    tick={{ fill: 'hsl(var(--foreground))', fontSize: 12 }}
+                    width={window.innerWidth < 640 ? 65 : 90}
+                    tick={{ fill: 'hsl(var(--foreground))', fontSize: window.innerWidth < 640 ? 10 : 12 }}
                     stroke="hsl(var(--muted-foreground))"
-                    tickFormatter={(value) => value || "Sem categoria"}
+                    tickFormatter={(value) => {
+                      if (window.innerWidth < 640 && value && value.length > 12) {
+                        return value.substring(0, 10) + '...';
+                      }
+                      return value || "Sem categoria";
+                    }}
                   />
                   <Tooltip
                     contentStyle={{
@@ -2037,6 +2047,164 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-base sm:text-lg text-foreground">Total</span>
                   <span className="font-bold text-lg sm:text-xl text-primary">
+                    {formatCurrency(total)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // Componente auxiliar para gráfico de Despesas por Categoria
+  const ExpenseCategoryChart = ({ data, title, subtitle, chartRef }: { 
+    data: any[] | undefined, 
+    title: string, 
+    subtitle?: string,
+    chartRef?: React.MutableRefObject<HTMLDivElement | null>
+  }) => {
+    if (!data || data.length === 0) {
+      return (
+        <Card className="border-0 shadow-elegant dashboard-card transition-all duration-300 hover:shadow-xl">
+          <CardHeader className="pb-4 px-4 sm:px-6">
+            <CardTitle className="text-lg sm:text-xl font-bold tracking-tight flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-destructive" />
+              <span>{title}</span>
+            </CardTitle>
+            {subtitle && (
+              <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>
+            )}
+          </CardHeader>
+          <CardContent className="px-4 sm:px-6 pb-6">
+            <div ref={chartRef} className="w-full">
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <BarChart3 className="w-12 h-12 text-muted-foreground/50 mb-4" />
+                <p className="text-muted-foreground font-medium">Nenhuma despesa encontrada</p>
+                <p className="text-sm text-muted-foreground mt-1">Cadastre despesas para visualizar o gráfico</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    const sortedData = [...data].sort((a: any, b: any) => b.amount - a.amount);
+    const total = data.reduce((sum: number, item: any) => sum + item.amount, 0);
+
+    return (
+      <Card className="border-0 shadow-elegant dashboard-card transition-all duration-300 hover:shadow-xl">
+        <CardHeader className="pb-4 px-4 sm:px-6">
+          <CardTitle className="text-lg sm:text-xl font-bold tracking-tight flex items-center gap-2">
+            <BarChart3 className="w-5 h-5 text-destructive" />
+            <span>{title}</span>
+          </CardTitle>
+          {subtitle && (
+            <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>
+          )}
+        </CardHeader>
+        <CardContent className="px-4 sm:px-6 pb-6">
+          <div ref={chartRef} className="w-full">
+            {/* Gráfico de Barras Horizontal */}
+            <div className="mb-6">
+              <ResponsiveContainer width="100%" height={Math.max(300, (data.length * 60) + 100)}>
+                <BarChart
+                  data={sortedData}
+                  layout="vertical"
+                  margin={{ 
+                    top: 10, 
+                    right: window.innerWidth < 640 ? 10 : 30, 
+                    left: window.innerWidth < 640 ? 70 : 100, 
+                    bottom: 10 
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                  <XAxis 
+                    type="number" 
+                    tickFormatter={(value) => formatCurrency(value)}
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={window.innerWidth < 640 ? 10 : 12}
+                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                  />
+                  <YAxis 
+                    type="category" 
+                    dataKey="category" 
+                    width={window.innerWidth < 640 ? 65 : 90}
+                    tick={{ fill: 'hsl(var(--foreground))', fontSize: window.innerWidth < 640 ? 10 : 12 }}
+                    stroke="hsl(var(--muted-foreground))"
+                    tickFormatter={(value) => {
+                      if (window.innerWidth < 640 && value && value.length > 12) {
+                        return value.substring(0, 10) + '...';
+                      }
+                      return value || "Sem categoria";
+                    }}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--popover))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '0.5rem',
+                      padding: '10px 14px',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                    }}
+                    formatter={(value: any) => formatCurrency(value)}
+                    labelStyle={{ fontWeight: 'bold', marginBottom: '6px', color: 'hsl(var(--foreground))' }}
+                    cursor={{ fill: 'hsl(var(--destructive) / 0.1)' }}
+                  />
+                  <Bar 
+                    dataKey="amount" 
+                    radius={[0, 8, 8, 0]}
+                  >
+                    {data.map((entry: any, index: number) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Lista de Categorias com Detalhes */}
+            <div className="space-y-3 border-t pt-4">
+              <h4 className="text-sm font-semibold text-foreground mb-3">Detalhamento por Categoria</h4>
+              {sortedData.map((item: any, index: number) => {
+                const percent = total > 0 ? ((item.amount / total) * 100).toFixed(1) : '0';
+                const categoryName = item.category || "Sem categoria";
+                const colorIndex = data.findIndex((d: any) => d.category === item.category || (!d.category && !item.category));
+                
+                return (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors border border-border/50"
+                  >
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div
+                        className="w-4 h-4 rounded-full flex-shrink-0"
+                        style={{ backgroundColor: COLORS[colorIndex % COLORS.length] }}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm sm:text-base text-foreground truncate">
+                          {categoryName}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {percent}% do total
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right flex-shrink-0 ml-4">
+                      <p className="font-bold text-base sm:text-lg text-destructive">
+                        {formatCurrency(item.amount)}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+              
+              {/* Total */}
+              <div className="mt-4 pt-4 border-t border-border">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-base sm:text-lg text-foreground">Total</span>
+                  <span className="font-bold text-lg sm:text-xl text-destructive">
                     {formatCurrency(total)}
                   </span>
                 </div>
@@ -3390,116 +3558,12 @@ export default function Dashboard() {
               chartRef={comparisonRevenueCategoryChartRef1}
             />
 
-            <Card className="border-0 shadow-elegant dashboard-card transition-all duration-300 hover:shadow-xl hover:scale-[1.01] overflow-visible">
-              <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-6">
-                <CardTitle className="text-base sm:text-lg md:text-xl font-bold tracking-tight flex items-center gap-2">
-                  <PieChartIcon className="w-4 h-4 sm:w-5 sm:h-5 text-destructive" />
-                  <span className="text-sm sm:text-base md:text-lg">Despesas por Categoria - Período 1</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="overflow-visible px-3 sm:px-6 pb-4 sm:pb-6">
-                <div ref={comparisonExpenseCategoryChartRef1} className="w-full overflow-visible">
-                  <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 500 : window.innerWidth < 768 ? 580 : 650} className="min-h-[500px] sm:min-h-[580px] md:min-h-[650px]">
-                    <PieChart margin={{ top: window.innerWidth < 640 ? 40 : 50, right: 10, bottom: window.innerWidth < 640 ? 200 : 240, left: 10 }}>
-                    <Pie
-                      data={comparisonExpensesByCategory1 || []}
-                      cx="50%"
-                      cy={window.innerWidth < 640 ? "35%" : "38%"}
-                      labelLine={false}
-                      label={false}
-                      outerRadius={window.innerWidth < 640 ? 70 : window.innerWidth < 768 ? 85 : 100}
-                      innerRadius={window.innerWidth < 640 ? 25 : 35}
-                      fill="#8884d8"
-                      dataKey="amount"
-                      paddingAngle={2}
-                    >
-                      {(comparisonExpensesByCategory1 || []).map((entry: any, index: number) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: 'hsl(var(--popover))', 
-                        border: '1px solid hsl(var(--border))',
-                        borderRadius: '0.75rem',
-                        padding: '8px 12px',
-                        fontSize: window.innerWidth < 640 ? '11px' : '13px'
-                      }}
-                      formatter={(value: any, name: string, props: any) => [
-                        formatCurrency(value),
-                        props.payload.category || name
-                      ]}
-                      labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
-                    />
-                    <Legend 
-                      verticalAlign="bottom"
-                      height={window.innerWidth < 640 ? 180 : 220}
-                      iconType="circle"
-                      wrapperStyle={{
-                        paddingTop: window.innerWidth < 640 ? '20px' : '25px',
-                        paddingBottom: window.innerWidth < 640 ? '10px' : '15px',
-                        fontSize: window.innerWidth < 640 ? '11px' : '13px',
-                        fontWeight: '600',
-                        display: 'grid',
-                        gridTemplateColumns: window.innerWidth < 640 ? 'repeat(2, 1fr)' : window.innerWidth < 768 ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
-                        gap: window.innerWidth < 640 ? '12px 8px' : '16px 12px',
-                        width: '100%',
-                        maxWidth: '100%',
-                        overflow: 'visible',
-                        lineHeight: '1.8',
-                        justifyContent: 'center',
-                        alignItems: 'start'
-                      }}
-                      formatter={(value, entry: any, index: number) => {
-                        const data = entry.payload;
-                        const total = comparisonExpensesByCategory1 ? comparisonExpensesByCategory1.reduce((sum: number, item: any) => sum + item.amount, 0) : 0;
-                        const percent = data && total > 0 ? ((data.amount / total) * 100).toFixed(1) : '0';
-                        const formattedValue = formatCurrency(data.amount || 0);
-                        const categoryName = value || "Sem categoria";
-                        return (
-                          <div style={{
-                            fontSize: window.innerWidth < 640 ? '11px' : '13px',
-                            fontWeight: '600',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'flex-start',
-                            gap: '4px',
-                            whiteSpace: 'normal',
-                            wordBreak: 'break-word',
-                            lineHeight: '1.5',
-                            textAlign: 'left',
-                            padding: '8px 10px',
-                            width: '100%',
-                            minWidth: window.innerWidth < 640 ? '100px' : '120px'
-                          }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                              <span style={{ 
-                                width: '10px', 
-                                height: '10px', 
-                                borderRadius: '50%', 
-                                backgroundColor: entry.color || COLORS[index % COLORS.length],
-                                display: 'inline-block',
-                                flexShrink: 0
-                              }}></span>
-                              <span style={{ fontWeight: '700', fontSize: window.innerWidth < 640 ? '12px' : '14px', color: 'hsl(var(--foreground))' }}>
-                                {categoryName}
-                              </span>
-                            </div>
-                            <span style={{ fontWeight: '800', color: 'hsl(var(--destructive))', fontSize: window.innerWidth < 640 ? '13px' : '15px', marginLeft: '16px' }}>
-                              R$ {formattedValue.replace('R$', '').trim()}
-                            </span>
-                            <span style={{ fontWeight: '600', color: 'hsl(var(--muted-foreground))', fontSize: window.innerWidth < 640 ? '10px' : '12px', marginLeft: '16px' }}>
-                              {percent}% do total
-                            </span>
-                          </div>
-                        );
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              </CardContent>
-            </Card>
+            <ExpenseCategoryChart
+              data={comparisonExpensesByCategory1}
+              title="Despesas por Categoria - Período 1"
+              subtitle="Distribuição das despesas por categoria no primeiro período"
+              chartRef={comparisonExpenseCategoryChartRef1}
+            />
               </div>
 
           {/* Período 2 */}
@@ -3511,116 +3575,12 @@ export default function Dashboard() {
               chartRef={comparisonRevenueCategoryChartRef2}
             />
 
-            <Card className="border-0 shadow-elegant dashboard-card transition-all duration-300 hover:shadow-xl hover:scale-[1.01] overflow-visible">
-              <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-6">
-                <CardTitle className="text-base sm:text-lg md:text-xl font-bold tracking-tight flex items-center gap-2">
-                  <PieChartIcon className="w-4 h-4 sm:w-5 sm:h-5 text-destructive" />
-                  <span className="text-sm sm:text-base md:text-lg">Despesas por Categoria - Período 2</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="overflow-visible px-3 sm:px-6 pb-4 sm:pb-6">
-                <div ref={comparisonExpenseCategoryChartRef2} className="w-full overflow-visible">
-                  <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 500 : window.innerWidth < 768 ? 580 : 650} className="min-h-[500px] sm:min-h-[580px] md:min-h-[650px]">
-                    <PieChart margin={{ top: window.innerWidth < 640 ? 40 : 50, right: 10, bottom: window.innerWidth < 640 ? 200 : 240, left: 10 }}>
-                    <Pie
-                      data={comparisonExpensesByCategory2 || []}
-                      cx="50%"
-                      cy={window.innerWidth < 640 ? "35%" : "38%"}
-                      labelLine={false}
-                      label={false}
-                      outerRadius={window.innerWidth < 640 ? 70 : window.innerWidth < 768 ? 85 : 100}
-                      innerRadius={window.innerWidth < 640 ? 25 : 35}
-                      fill="#8884d8"
-                      dataKey="amount"
-                      paddingAngle={2}
-                    >
-                      {(comparisonExpensesByCategory2 || []).map((entry: any, index: number) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: 'hsl(var(--popover))', 
-                        border: '1px solid hsl(var(--border))',
-                        borderRadius: '0.75rem',
-                        padding: '8px 12px',
-                        fontSize: window.innerWidth < 640 ? '11px' : '13px'
-                      }}
-                      formatter={(value: any, name: string, props: any) => [
-                        formatCurrency(value),
-                        props.payload.category || name
-                      ]}
-                      labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
-                    />
-                    <Legend 
-                      verticalAlign="bottom"
-                      height={window.innerWidth < 640 ? 180 : 220}
-                      iconType="circle"
-                      wrapperStyle={{
-                        paddingTop: window.innerWidth < 640 ? '20px' : '25px',
-                        paddingBottom: window.innerWidth < 640 ? '10px' : '15px',
-                        fontSize: window.innerWidth < 640 ? '11px' : '13px',
-                        fontWeight: '600',
-                        display: 'grid',
-                        gridTemplateColumns: window.innerWidth < 640 ? 'repeat(2, 1fr)' : window.innerWidth < 768 ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
-                        gap: window.innerWidth < 640 ? '12px 8px' : '16px 12px',
-                        width: '100%',
-                        maxWidth: '100%',
-                        overflow: 'visible',
-                        lineHeight: '1.8',
-                        justifyContent: 'center',
-                        alignItems: 'start'
-                      }}
-                      formatter={(value, entry: any, index: number) => {
-                        const data = entry.payload;
-                        const total = comparisonExpensesByCategory2 ? comparisonExpensesByCategory2.reduce((sum: number, item: any) => sum + item.amount, 0) : 0;
-                        const percent = data && total > 0 ? ((data.amount / total) * 100).toFixed(1) : '0';
-                        const formattedValue = formatCurrency(data.amount || 0);
-                        const categoryName = value || "Sem categoria";
-                        return (
-                          <div style={{
-                            fontSize: window.innerWidth < 640 ? '11px' : '13px',
-                            fontWeight: '600',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'flex-start',
-                            gap: '4px',
-                            whiteSpace: 'normal',
-                            wordBreak: 'break-word',
-                            lineHeight: '1.5',
-                            textAlign: 'left',
-                            padding: '8px 10px',
-                            width: '100%',
-                            minWidth: window.innerWidth < 640 ? '100px' : '120px'
-                          }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                              <span style={{ 
-                                width: '10px', 
-                                height: '10px', 
-                                borderRadius: '50%', 
-                                backgroundColor: entry.color || COLORS[index % COLORS.length],
-                                display: 'inline-block',
-                                flexShrink: 0
-                              }}></span>
-                              <span style={{ fontWeight: '700', fontSize: window.innerWidth < 640 ? '12px' : '14px', color: 'hsl(var(--foreground))' }}>
-                                {categoryName}
-                              </span>
-                            </div>
-                            <span style={{ fontWeight: '800', color: 'hsl(var(--destructive))', fontSize: window.innerWidth < 640 ? '13px' : '15px', marginLeft: '16px' }}>
-                              R$ {formattedValue.replace('R$', '').trim()}
-                            </span>
-                            <span style={{ fontWeight: '600', color: 'hsl(var(--muted-foreground))', fontSize: window.innerWidth < 640 ? '10px' : '12px', marginLeft: '16px' }}>
-                              {percent}% do total
-                            </span>
-                          </div>
-                        );
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-      </div>
-              </CardContent>
-            </Card>
+            <ExpenseCategoryChart
+              data={comparisonExpensesByCategory2}
+              title="Despesas por Categoria - Período 2"
+              subtitle="Distribuição das despesas por categoria no segundo período"
+              chartRef={comparisonExpenseCategoryChartRef2}
+            />
           </div>
         </>
       ) : (
@@ -3634,116 +3594,12 @@ export default function Dashboard() {
           />
 
           {/* Despesas por Categoria */}
-          <Card className="border-0 shadow-elegant dashboard-card transition-all duration-300 hover:shadow-xl hover:scale-[1.01] overflow-visible">
-            <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-6">
-              <CardTitle className="text-base sm:text-lg md:text-xl font-bold tracking-tight flex items-center gap-2">
-                <PieChartIcon className="w-4 h-4 sm:w-5 sm:h-5 text-destructive" />
-                <span className="text-sm sm:text-base md:text-lg">Despesas por Categoria</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="overflow-visible px-3 sm:px-6 pb-4 sm:pb-6">
-              <div ref={expenseCategoryChartRef} className="w-full overflow-visible">
-                <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 500 : window.innerWidth < 768 ? 580 : 650} className="min-h-[500px] sm:min-h-[580px] md:min-h-[650px]">
-                  <PieChart margin={{ top: window.innerWidth < 640 ? 40 : 50, right: 10, bottom: window.innerWidth < 640 ? 200 : 240, left: 10 }}>
-                  <Pie
-                    data={expensesByCategory || []}
-                    cx="50%"
-                    cy={window.innerWidth < 640 ? "35%" : "38%"}
-                    labelLine={false}
-                    label={false}
-                    outerRadius={window.innerWidth < 640 ? 70 : window.innerWidth < 768 ? 85 : 100}
-                    innerRadius={window.innerWidth < 640 ? 25 : 35}
-                    fill="#8884d8"
-                    dataKey="amount"
-                    paddingAngle={2}
-                  >
-                    {(expensesByCategory || []).map((entry: any, index: number) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(var(--popover))', 
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '0.75rem',
-                      padding: '8px 12px',
-                      fontSize: window.innerWidth < 640 ? '11px' : '13px'
-                    }}
-                    formatter={(value: any, name: string, props: any) => [
-                      formatCurrency(value),
-                      props.payload.category || name
-                    ]}
-                    labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
-                  />
-                  <Legend 
-                    verticalAlign="bottom"
-                    height={window.innerWidth < 640 ? 180 : 220}
-                    iconType="circle"
-                    wrapperStyle={{
-                      paddingTop: window.innerWidth < 640 ? '20px' : '25px',
-                      paddingBottom: window.innerWidth < 640 ? '10px' : '15px',
-                      fontSize: window.innerWidth < 640 ? '11px' : '13px',
-                      fontWeight: '600',
-                      display: 'grid',
-                      gridTemplateColumns: window.innerWidth < 640 ? 'repeat(2, 1fr)' : window.innerWidth < 768 ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
-                      gap: window.innerWidth < 640 ? '12px 8px' : '16px 12px',
-                      width: '100%',
-                      maxWidth: '100%',
-                      overflow: 'visible',
-                      lineHeight: '1.8',
-                      justifyContent: 'center',
-                      alignItems: 'start'
-                    }}
-                    formatter={(value, entry: any, index: number) => {
-                      const data = entry.payload;
-                      const total = expensesByCategory ? expensesByCategory.reduce((sum: number, item: any) => sum + item.amount, 0) : 0;
-                      const percent = data && total > 0 ? ((data.amount / total) * 100).toFixed(1) : '0';
-                      const formattedValue = formatCurrency(data.amount || 0);
-                      const categoryName = value || "Sem categoria";
-                      return (
-                        <div style={{
-                          fontSize: window.innerWidth < 640 ? '11px' : '13px',
-                          fontWeight: '600',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'flex-start',
-                          gap: '4px',
-                          whiteSpace: 'normal',
-                          wordBreak: 'break-word',
-                          lineHeight: '1.5',
-                          textAlign: 'left',
-                          padding: '8px 10px',
-                          width: '100%',
-                          minWidth: window.innerWidth < 640 ? '100px' : '120px'
-                        }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <span style={{ 
-                              width: '10px', 
-                              height: '10px', 
-                              borderRadius: '50%', 
-                              backgroundColor: entry.color || COLORS[index % COLORS.length],
-                              display: 'inline-block',
-                              flexShrink: 0
-                            }}></span>
-                            <span style={{ fontWeight: '700', fontSize: window.innerWidth < 640 ? '12px' : '14px', color: 'hsl(var(--foreground))' }}>
-                              {categoryName}
-                            </span>
-                          </div>
-                          <span style={{ fontWeight: '800', color: 'hsl(var(--destructive))', fontSize: window.innerWidth < 640 ? '13px' : '15px', marginLeft: '16px' }}>
-                            R$ {formattedValue.replace('R$', '').trim()}
-                          </span>
-                          <span style={{ fontWeight: '600', color: 'hsl(var(--muted-foreground))', fontSize: window.innerWidth < 640 ? '10px' : '12px', marginLeft: '16px' }}>
-                            {percent}% do total
-                          </span>
-                        </div>
-                      );
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-                </div>
-            </CardContent>
-          </Card>
+          <ExpenseCategoryChart
+            data={expensesByCategory}
+            title="Despesas por Categoria"
+            subtitle="Distribuição das despesas por categoria no período selecionado"
+            chartRef={expenseCategoryChartRef}
+          />
         </div>
       )}
 
