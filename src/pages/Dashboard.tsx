@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -3154,25 +3154,27 @@ export default function Dashboard() {
           {/* Período 1 */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6">
             <Card className="border-0 shadow-elegant dashboard-card transition-all duration-300 hover:shadow-xl hover:scale-[1.01] overflow-visible">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-xl font-bold tracking-tight flex items-center gap-2">
-                  <PieChartIcon className="w-5 h-5 text-primary" />
-                  Receitas por Categoria - Período 1
+              <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-6">
+                <CardTitle className="text-base sm:text-lg md:text-xl font-bold tracking-tight flex items-center gap-2">
+                  <PieChartIcon className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                  <span className="text-sm sm:text-base md:text-lg">Receitas por Categoria - Período 1</span>
                 </CardTitle>
           </CardHeader>
-              <CardContent className="overflow-visible">
+              <CardContent className="overflow-visible px-3 sm:px-6 pb-3 sm:pb-6">
                 <div ref={comparisonRevenueCategoryChartRef1} className="w-full overflow-visible">
-                  <ResponsiveContainer width="100%" height={getChartHeight()} className={getChartMinHeight()}>
+                  <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 280 : window.innerWidth < 768 ? 320 : getChartHeight()} className={getChartMinHeight()}>
                     <PieChart>
                     <Pie
                       data={comparisonRevenueByCategory1 || []}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ category, percent }) => `${category}: ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={100}
+                      label={false}
+                      outerRadius={window.innerWidth < 640 ? 70 : window.innerWidth < 768 ? 85 : 100}
+                      innerRadius={window.innerWidth < 640 ? 20 : 30}
                       fill="#8884d8"
                       dataKey="amount"
+                      paddingAngle={2}
                     >
                       {(comparisonRevenueByCategory1 || []).map((entry: any, index: number) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -3182,9 +3184,45 @@ export default function Dashboard() {
                       contentStyle={{ 
                         backgroundColor: 'hsl(var(--popover))', 
                         border: '1px solid hsl(var(--border))',
-                        borderRadius: '0.5rem'
+                        borderRadius: '0.75rem',
+                        padding: '8px 12px',
+                        fontSize: window.innerWidth < 640 ? '11px' : '13px'
                       }}
-                      formatter={(value: any) => formatCurrency(value)}
+                      formatter={(value: any, name: string, props: any) => [
+                        formatCurrency(value),
+                        props.payload.category || name
+                      ]}
+                      labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
+                    />
+                    <Legend 
+                      verticalAlign="bottom"
+                      height={window.innerWidth < 640 ? 80 : 100}
+                      iconType="circle"
+                      wrapperStyle={{
+                        paddingTop: window.innerWidth < 640 ? '8px' : '12px',
+                        fontSize: window.innerWidth < 640 ? '10px' : '12px',
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        justifyContent: 'center',
+                        gap: window.innerWidth < 640 ? '8px' : '12px'
+                      }}
+                      formatter={(value, entry: any) => {
+                        const data = entry.payload;
+                        const percent = data && comparisonRevenueByCategory1 ? 
+                          ((data.amount / comparisonRevenueByCategory1.reduce((sum: number, item: any) => sum + item.amount, 0)) * 100).toFixed(1) : '0';
+                        return (
+                          <span style={{
+                            fontSize: window.innerWidth < 640 ? '10px' : '12px',
+                            fontWeight: '500',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}>
+                            <span>{value}:</span>
+                            <span style={{ fontWeight: '700' }}>{percent}%</span>
+                          </span>
+                        );
+                      }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
@@ -3193,25 +3231,27 @@ export default function Dashboard() {
             </Card>
 
             <Card className="border-0 shadow-elegant dashboard-card transition-all duration-300 hover:shadow-xl hover:scale-[1.01] overflow-visible">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-xl font-bold tracking-tight flex items-center gap-2">
-                  <PieChartIcon className="w-5 h-5 text-destructive" />
-                  Despesas por Categoria - Período 1
+              <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-6">
+                <CardTitle className="text-base sm:text-lg md:text-xl font-bold tracking-tight flex items-center gap-2">
+                  <PieChartIcon className="w-4 h-4 sm:w-5 sm:h-5 text-destructive" />
+                  <span className="text-sm sm:text-base md:text-lg">Despesas por Categoria - Período 1</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="overflow-visible">
+              <CardContent className="overflow-visible px-3 sm:px-6 pb-3 sm:pb-6">
                 <div ref={comparisonExpenseCategoryChartRef1} className="w-full overflow-visible">
-                  <ResponsiveContainer width="100%" height={getChartHeight()} className={getChartMinHeight()}>
+                  <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 280 : window.innerWidth < 768 ? 320 : getChartHeight()} className={getChartMinHeight()}>
                     <PieChart>
                     <Pie
                       data={comparisonExpensesByCategory1 || []}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ category, percent }) => `${category}: ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={100}
+                      label={false}
+                      outerRadius={window.innerWidth < 640 ? 70 : window.innerWidth < 768 ? 85 : 100}
+                      innerRadius={window.innerWidth < 640 ? 20 : 30}
                       fill="#8884d8"
                       dataKey="amount"
+                      paddingAngle={2}
                     >
                       {(comparisonExpensesByCategory1 || []).map((entry: any, index: number) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -3221,9 +3261,45 @@ export default function Dashboard() {
                       contentStyle={{ 
                         backgroundColor: 'hsl(var(--popover))', 
                         border: '1px solid hsl(var(--border))',
-                        borderRadius: '0.5rem'
+                        borderRadius: '0.75rem',
+                        padding: '8px 12px',
+                        fontSize: window.innerWidth < 640 ? '11px' : '13px'
                       }}
-                      formatter={(value: any) => formatCurrency(value)}
+                      formatter={(value: any, name: string, props: any) => [
+                        formatCurrency(value),
+                        props.payload.category || name
+                      ]}
+                      labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
+                    />
+                    <Legend 
+                      verticalAlign="bottom"
+                      height={window.innerWidth < 640 ? 80 : 100}
+                      iconType="circle"
+                      wrapperStyle={{
+                        paddingTop: window.innerWidth < 640 ? '8px' : '12px',
+                        fontSize: window.innerWidth < 640 ? '10px' : '12px',
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        justifyContent: 'center',
+                        gap: window.innerWidth < 640 ? '8px' : '12px'
+                      }}
+                      formatter={(value, entry: any) => {
+                        const data = entry.payload;
+                        const percent = data && comparisonExpensesByCategory1 ? 
+                          ((data.amount / comparisonExpensesByCategory1.reduce((sum: number, item: any) => sum + item.amount, 0)) * 100).toFixed(1) : '0';
+                        return (
+                          <span style={{
+                            fontSize: window.innerWidth < 640 ? '10px' : '12px',
+                            fontWeight: '500',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}>
+                            <span>{value}:</span>
+                            <span style={{ fontWeight: '700' }}>{percent}%</span>
+                          </span>
+                        );
+                      }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
@@ -3235,25 +3311,27 @@ export default function Dashboard() {
           {/* Período 2 */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6">
             <Card className="border-0 shadow-elegant dashboard-card transition-all duration-300 hover:shadow-xl hover:scale-[1.01] overflow-visible">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-xl font-bold tracking-tight flex items-center gap-2">
-                  <PieChartIcon className="w-5 h-5 text-primary" />
-                  Receitas por Categoria - Período 2
+              <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-6">
+                <CardTitle className="text-base sm:text-lg md:text-xl font-bold tracking-tight flex items-center gap-2">
+                  <PieChartIcon className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                  <span className="text-sm sm:text-base md:text-lg">Receitas por Categoria - Período 2</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="overflow-visible">
+              <CardContent className="overflow-visible px-3 sm:px-6 pb-3 sm:pb-6">
                 <div ref={comparisonRevenueCategoryChartRef2} className="w-full overflow-visible">
-                  <ResponsiveContainer width="100%" height={getChartHeight()} className={getChartMinHeight()}>
+                  <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 280 : window.innerWidth < 768 ? 320 : getChartHeight()} className={getChartMinHeight()}>
                     <PieChart>
                     <Pie
                       data={comparisonRevenueByCategory2 || []}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ category, percent }) => `${category}: ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={100}
+                      label={false}
+                      outerRadius={window.innerWidth < 640 ? 70 : window.innerWidth < 768 ? 85 : 100}
+                      innerRadius={window.innerWidth < 640 ? 20 : 30}
                       fill="#8884d8"
                       dataKey="amount"
+                      paddingAngle={2}
                     >
                       {(comparisonRevenueByCategory2 || []).map((entry: any, index: number) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -3263,9 +3341,45 @@ export default function Dashboard() {
                       contentStyle={{ 
                         backgroundColor: 'hsl(var(--popover))', 
                         border: '1px solid hsl(var(--border))',
-                        borderRadius: '0.5rem'
+                        borderRadius: '0.75rem',
+                        padding: '8px 12px',
+                        fontSize: window.innerWidth < 640 ? '11px' : '13px'
                       }}
-                      formatter={(value: any) => formatCurrency(value)}
+                      formatter={(value: any, name: string, props: any) => [
+                        formatCurrency(value),
+                        props.payload.category || name
+                      ]}
+                      labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
+                    />
+                    <Legend 
+                      verticalAlign="bottom"
+                      height={window.innerWidth < 640 ? 80 : 100}
+                      iconType="circle"
+                      wrapperStyle={{
+                        paddingTop: window.innerWidth < 640 ? '8px' : '12px',
+                        fontSize: window.innerWidth < 640 ? '10px' : '12px',
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        justifyContent: 'center',
+                        gap: window.innerWidth < 640 ? '8px' : '12px'
+                      }}
+                      formatter={(value, entry: any) => {
+                        const data = entry.payload;
+                        const percent = data && comparisonRevenueByCategory2 ? 
+                          ((data.amount / comparisonRevenueByCategory2.reduce((sum: number, item: any) => sum + item.amount, 0)) * 100).toFixed(1) : '0';
+                        return (
+                          <span style={{
+                            fontSize: window.innerWidth < 640 ? '10px' : '12px',
+                            fontWeight: '500',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}>
+                            <span>{value}:</span>
+                            <span style={{ fontWeight: '700' }}>{percent}%</span>
+                          </span>
+                        );
+                      }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
@@ -3274,25 +3388,27 @@ export default function Dashboard() {
         </Card>
 
             <Card className="border-0 shadow-elegant dashboard-card transition-all duration-300 hover:shadow-xl hover:scale-[1.01] overflow-visible">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-xl font-bold tracking-tight flex items-center gap-2">
-                  <PieChartIcon className="w-5 h-5 text-destructive" />
-                  Despesas por Categoria - Período 2
+              <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-6">
+                <CardTitle className="text-base sm:text-lg md:text-xl font-bold tracking-tight flex items-center gap-2">
+                  <PieChartIcon className="w-4 h-4 sm:w-5 sm:h-5 text-destructive" />
+                  <span className="text-sm sm:text-base md:text-lg">Despesas por Categoria - Período 2</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="overflow-visible">
+              <CardContent className="overflow-visible px-3 sm:px-6 pb-3 sm:pb-6">
                 <div ref={comparisonExpenseCategoryChartRef2} className="w-full overflow-visible">
-                  <ResponsiveContainer width="100%" height={getChartHeight()} className={getChartMinHeight()}>
+                  <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 280 : window.innerWidth < 768 ? 320 : getChartHeight()} className={getChartMinHeight()}>
                     <PieChart>
                     <Pie
                       data={comparisonExpensesByCategory2 || []}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ category, percent }) => `${category}: ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={100}
+                      label={false}
+                      outerRadius={window.innerWidth < 640 ? 70 : window.innerWidth < 768 ? 85 : 100}
+                      innerRadius={window.innerWidth < 640 ? 20 : 30}
                       fill="#8884d8"
                       dataKey="amount"
+                      paddingAngle={2}
                     >
                       {(comparisonExpensesByCategory2 || []).map((entry: any, index: number) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -3302,9 +3418,45 @@ export default function Dashboard() {
                       contentStyle={{ 
                         backgroundColor: 'hsl(var(--popover))', 
                         border: '1px solid hsl(var(--border))',
-                        borderRadius: '0.5rem'
+                        borderRadius: '0.75rem',
+                        padding: '8px 12px',
+                        fontSize: window.innerWidth < 640 ? '11px' : '13px'
                       }}
-                      formatter={(value: any) => formatCurrency(value)}
+                      formatter={(value: any, name: string, props: any) => [
+                        formatCurrency(value),
+                        props.payload.category || name
+                      ]}
+                      labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
+                    />
+                    <Legend 
+                      verticalAlign="bottom"
+                      height={window.innerWidth < 640 ? 80 : 100}
+                      iconType="circle"
+                      wrapperStyle={{
+                        paddingTop: window.innerWidth < 640 ? '8px' : '12px',
+                        fontSize: window.innerWidth < 640 ? '10px' : '12px',
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        justifyContent: 'center',
+                        gap: window.innerWidth < 640 ? '8px' : '12px'
+                      }}
+                      formatter={(value, entry: any) => {
+                        const data = entry.payload;
+                        const percent = data && comparisonExpensesByCategory2 ? 
+                          ((data.amount / comparisonExpensesByCategory2.reduce((sum: number, item: any) => sum + item.amount, 0)) * 100).toFixed(1) : '0';
+                        return (
+                          <span style={{
+                            fontSize: window.innerWidth < 640 ? '10px' : '12px',
+                            fontWeight: '500',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}>
+                            <span>{value}:</span>
+                            <span style={{ fontWeight: '700' }}>{percent}%</span>
+                          </span>
+                        );
+                      }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
@@ -3317,48 +3469,27 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6">
           {/* Receitas por Categoria */}
           <Card className="border-0 shadow-elegant dashboard-card transition-all duration-300 hover:shadow-xl hover:scale-[1.01] overflow-visible">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-xl font-bold tracking-tight flex items-center gap-2">
-                <PieChartIcon className="w-5 h-5 text-primary" />
-                Receitas por Categoria
+            <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-6">
+              <CardTitle className="text-base sm:text-lg md:text-xl font-bold tracking-tight flex items-center gap-2">
+                <PieChartIcon className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                <span className="text-sm sm:text-base md:text-lg">Receitas por Categoria</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="overflow-visible">
+            <CardContent className="overflow-visible px-3 sm:px-6 pb-3 sm:pb-6">
               <div ref={revenueCategoryChartRef} className="w-full overflow-visible">
-                <ResponsiveContainer width="100%" height={getChartHeight()} className={getChartMinHeight()}>
+                <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 280 : window.innerWidth < 768 ? 320 : getChartHeight()} className={getChartMinHeight()}>
                   <PieChart>
                   <Pie
                     data={revenueByCategory || []}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={props => {
-                      const { category, percent, cx, cy, midAngle, outerRadius, fill, index } = props;
-                      // Hide labels for slices < 4%
-                      if (percent < 0.04) return null;
-                      // Calculate position outside the pie
-                      const RADIAN = Math.PI / 180;
-                      const radius = outerRadius + 24;
-                      const x = cx + radius * Math.cos(-midAngle * RADIAN);
-                      const y = cy + radius * Math.sin(-midAngle * RADIAN);
-                      return (
-                        <text
-                          x={x}
-                          y={y}
-                          fill={fill || '#333'}
-                          textAnchor={x > cx ? 'start' : 'end'}
-                          dominantBaseline="central"
-                          fontSize={window.innerWidth < 640 ? 12 : 14}
-                          fontWeight="bold"
-                          style={{ pointerEvents: 'none', userSelect: 'none' }}
-                        >
-                          {category}: {(percent * 100).toFixed(0)}%
-                        </text>
-                      );
-                    }}
-                    outerRadius={100}
+                    label={false}
+                    outerRadius={window.innerWidth < 640 ? 70 : window.innerWidth < 768 ? 85 : 100}
+                    innerRadius={window.innerWidth < 640 ? 20 : 30}
                     fill="#8884d8"
                     dataKey="amount"
+                    paddingAngle={2}
                   >
                     {(revenueByCategory || []).map((entry: any, index: number) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -3368,9 +3499,45 @@ export default function Dashboard() {
                     contentStyle={{ 
                       backgroundColor: 'hsl(var(--popover))', 
                       border: '1px solid hsl(var(--border))',
-                      borderRadius: '0.5rem'
+                      borderRadius: '0.75rem',
+                      padding: '8px 12px',
+                      fontSize: window.innerWidth < 640 ? '11px' : '13px'
                     }}
-                    formatter={(value: any) => formatCurrency(value)}
+                    formatter={(value: any, name: string, props: any) => [
+                      formatCurrency(value),
+                      props.payload.category || name
+                    ]}
+                    labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
+                  />
+                  <Legend 
+                    verticalAlign="bottom"
+                    height={window.innerWidth < 640 ? 80 : 100}
+                    iconType="circle"
+                    wrapperStyle={{
+                      paddingTop: window.innerWidth < 640 ? '8px' : '12px',
+                      fontSize: window.innerWidth < 640 ? '10px' : '12px',
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      justifyContent: 'center',
+                      gap: window.innerWidth < 640 ? '8px' : '12px'
+                    }}
+                    formatter={(value, entry: any) => {
+                      const data = entry.payload;
+                      const percent = data && revenueByCategory ? 
+                        ((data.amount / revenueByCategory.reduce((sum: number, item: any) => sum + item.amount, 0)) * 100).toFixed(1) : '0';
+                      return (
+                        <span style={{
+                          fontSize: window.innerWidth < 640 ? '10px' : '12px',
+                          fontWeight: '500',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}>
+                          <span>{value}:</span>
+                          <span style={{ fontWeight: '700' }}>{percent}%</span>
+                        </span>
+                      );
+                    }}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -3380,25 +3547,27 @@ export default function Dashboard() {
 
           {/* Despesas por Categoria */}
           <Card className="border-0 shadow-elegant dashboard-card transition-all duration-300 hover:shadow-xl hover:scale-[1.01] overflow-visible">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-xl font-bold tracking-tight flex items-center gap-2">
-                <PieChartIcon className="w-5 h-5 text-destructive" />
-                Despesas por Categoria
+            <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-6">
+              <CardTitle className="text-base sm:text-lg md:text-xl font-bold tracking-tight flex items-center gap-2">
+                <PieChartIcon className="w-4 h-4 sm:w-5 sm:h-5 text-destructive" />
+                <span className="text-sm sm:text-base md:text-lg">Despesas por Categoria</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="overflow-visible">
+            <CardContent className="overflow-visible px-3 sm:px-6 pb-3 sm:pb-6">
               <div ref={expenseCategoryChartRef} className="w-full overflow-visible">
-                <ResponsiveContainer width="100%" height={getChartHeight()} className={getChartMinHeight()}>
+                <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 280 : window.innerWidth < 768 ? 320 : getChartHeight()} className={getChartMinHeight()}>
                   <PieChart>
                   <Pie
                     data={expensesByCategory || []}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ category, percent }) => `${category}: ${(percent * 100).toFixed(0)}%`}
-                    outerRadius={100}
+                    label={false}
+                    outerRadius={window.innerWidth < 640 ? 70 : window.innerWidth < 768 ? 85 : 100}
+                    innerRadius={window.innerWidth < 640 ? 20 : 30}
                     fill="#8884d8"
                     dataKey="amount"
+                    paddingAngle={2}
                   >
                     {(expensesByCategory || []).map((entry: any, index: number) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -3408,9 +3577,45 @@ export default function Dashboard() {
                     contentStyle={{ 
                       backgroundColor: 'hsl(var(--popover))', 
                       border: '1px solid hsl(var(--border))',
-                      borderRadius: '0.5rem'
+                      borderRadius: '0.75rem',
+                      padding: '8px 12px',
+                      fontSize: window.innerWidth < 640 ? '11px' : '13px'
                     }}
-                    formatter={(value: any) => formatCurrency(value)}
+                    formatter={(value: any, name: string, props: any) => [
+                      formatCurrency(value),
+                      props.payload.category || name
+                    ]}
+                    labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
+                  />
+                  <Legend 
+                    verticalAlign="bottom"
+                    height={window.innerWidth < 640 ? 80 : 100}
+                    iconType="circle"
+                    wrapperStyle={{
+                      paddingTop: window.innerWidth < 640 ? '8px' : '12px',
+                      fontSize: window.innerWidth < 640 ? '10px' : '12px',
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      justifyContent: 'center',
+                      gap: window.innerWidth < 640 ? '8px' : '12px'
+                    }}
+                    formatter={(value, entry: any) => {
+                      const data = entry.payload;
+                      const percent = data && expensesByCategory ? 
+                        ((data.amount / expensesByCategory.reduce((sum: number, item: any) => sum + item.amount, 0)) * 100).toFixed(1) : '0';
+                      return (
+                        <span style={{
+                          fontSize: window.innerWidth < 640 ? '10px' : '12px',
+                          fontWeight: '500',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}>
+                          <span>{value}:</span>
+                          <span style={{ fontWeight: '700' }}>{percent}%</span>
+                        </span>
+                      );
+                    }}
                   />
                 </PieChart>
               </ResponsiveContainer>

@@ -34,12 +34,12 @@ export const QuickActions = () => {
   ];
 
   return (
-    <Card className="mb-6 shadow-elegant rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base font-semibold tracking-tight text-foreground">Ações Rápidas</CardTitle>
+    <Card className="mb-4 sm:mb-6 shadow-sm rounded-lg border border-border/40 bg-card">
+      <CardHeader className="pb-2 sm:pb-3 px-3 sm:px-6 pt-3 sm:pt-6">
+        <CardTitle className="text-sm sm:text-base font-semibold tracking-tight text-foreground">Ações Rápidas</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
           {actions.map((action) => {
             const Icon = action.icon;
             return (
@@ -47,21 +47,21 @@ export const QuickActions = () => {
                 key={action.label}
                 variant="ghost"
                 className={`
-                  flex flex-col items-center justify-center gap-2 
-                  h-auto py-4 px-3 rounded-lg 
-                  border border-border/30 
+                  flex flex-col items-center justify-center gap-1.5 sm:gap-2 
+                  h-auto py-3 sm:py-4 px-2 sm:px-3 rounded-lg 
+                  border border-border/40 
                   transition-all duration-200 
-                  hover:scale-[1.02] hover:shadow-md 
+                  hover:scale-[1.02] hover:shadow-sm hover:border-primary/50
                   active:scale-[0.98]
                   focus:ring-2 focus:ring-primary/30 
                   ${action.color}
                 `}
                 onClick={action.onClick}
               >
-                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-background/80 shadow-sm">
-                  <Icon className="w-5 h-5 text-foreground" />
+                <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-md bg-background/90 shadow-sm">
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-foreground" />
                 </div>
-                <span className="text-xs font-medium text-foreground text-center leading-tight">{action.label}</span>
+                <span className="text-[10px] sm:text-xs font-medium text-foreground text-center leading-tight px-1">{action.label}</span>
               </Button>
             );
           })}

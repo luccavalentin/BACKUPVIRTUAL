@@ -526,24 +526,26 @@ export default function Relatorios() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Receitas por Categoria */}
         <Card className="border-0 shadow-elegant">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-xl font-bold tracking-tight flex items-center gap-2">
-              <PieChart className="w-5 h-5 text-primary" />
-              Receitas por Categoria
+          <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-6">
+            <CardTitle className="text-base sm:text-lg md:text-xl font-bold tracking-tight flex items-center gap-2">
+              <PieChart className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+              <span className="text-sm sm:text-base md:text-lg">Receitas por Categoria</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
+          <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
+            <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 280 : 300}>
               <RechartsPieChart>
                 <Pie
                   data={revenueByCategory || []}
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={renderCustomPieLabel}
-                  outerRadius={100}
+                  label={false}
+                  outerRadius={window.innerWidth < 640 ? 70 : window.innerWidth < 768 ? 85 : 100}
+                  innerRadius={window.innerWidth < 640 ? 20 : 30}
                   fill="#8884d8"
                   dataKey="amount"
+                  paddingAngle={2}
                 >
                   {(revenueByCategory || []).map((entry: any, index: number) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -553,9 +555,45 @@ export default function Relatorios() {
                   contentStyle={{ 
                     backgroundColor: 'hsl(var(--popover))', 
                     border: '1px solid hsl(var(--border))',
-                    borderRadius: '0.5rem'
+                    borderRadius: '0.75rem',
+                    padding: '8px 12px',
+                    fontSize: window.innerWidth < 640 ? '11px' : '13px'
                   }}
-                  formatter={(value: any) => formatCurrency(value)}
+                  formatter={(value: any, name: string, props: any) => [
+                    formatCurrency(value),
+                    props.payload.category || name
+                  ]}
+                  labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
+                />
+                <Legend 
+                  verticalAlign="bottom"
+                  height={window.innerWidth < 640 ? 80 : 100}
+                  iconType="circle"
+                  wrapperStyle={{
+                    paddingTop: window.innerWidth < 640 ? '8px' : '12px',
+                    fontSize: window.innerWidth < 640 ? '10px' : '12px',
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    justifyContent: 'center',
+                    gap: window.innerWidth < 640 ? '8px' : '12px'
+                  }}
+                  formatter={(value, entry: any) => {
+                    const data = entry.payload;
+                    const percent = data && revenueByCategory ? 
+                      ((data.amount / revenueByCategory.reduce((sum: number, item: any) => sum + item.amount, 0)) * 100).toFixed(1) : '0';
+                    return (
+                      <span style={{
+                        fontSize: window.innerWidth < 640 ? '10px' : '12px',
+                        fontWeight: '500',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}>
+                        <span>{value}:</span>
+                        <span style={{ fontWeight: '700' }}>{percent}%</span>
+                      </span>
+                    );
+                  }}
                 />
               </RechartsPieChart>
             </ResponsiveContainer>
@@ -564,24 +602,26 @@ export default function Relatorios() {
 
         {/* Despesas por Categoria */}
         <Card className="border-0 shadow-elegant">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-xl font-bold tracking-tight flex items-center gap-2">
-              <PieChart className="w-5 h-5 text-destructive" />
-              Despesas por Categoria
+          <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-6">
+            <CardTitle className="text-base sm:text-lg md:text-xl font-bold tracking-tight flex items-center gap-2">
+              <PieChart className="w-4 h-4 sm:w-5 sm:h-5 text-destructive" />
+              <span className="text-sm sm:text-base md:text-lg">Despesas por Categoria</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
+          <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
+            <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 280 : 300}>
               <RechartsPieChart>
                 <Pie
                   data={expensesByCategory || []}
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={renderCustomPieLabel}
-                  outerRadius={100}
+                  label={false}
+                  outerRadius={window.innerWidth < 640 ? 70 : window.innerWidth < 768 ? 85 : 100}
+                  innerRadius={window.innerWidth < 640 ? 20 : 30}
                   fill="#8884d8"
                   dataKey="amount"
+                  paddingAngle={2}
                 >
                   {(expensesByCategory || []).map((entry: any, index: number) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -591,9 +631,45 @@ export default function Relatorios() {
                   contentStyle={{ 
                     backgroundColor: 'hsl(var(--popover))', 
                     border: '1px solid hsl(var(--border))',
-                    borderRadius: '0.5rem'
+                    borderRadius: '0.75rem',
+                    padding: '8px 12px',
+                    fontSize: window.innerWidth < 640 ? '11px' : '13px'
                   }}
-                  formatter={(value: any) => formatCurrency(value)}
+                  formatter={(value: any, name: string, props: any) => [
+                    formatCurrency(value),
+                    props.payload.category || name
+                  ]}
+                  labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
+                />
+                <Legend 
+                  verticalAlign="bottom"
+                  height={window.innerWidth < 640 ? 80 : 100}
+                  iconType="circle"
+                  wrapperStyle={{
+                    paddingTop: window.innerWidth < 640 ? '8px' : '12px',
+                    fontSize: window.innerWidth < 640 ? '10px' : '12px',
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    justifyContent: 'center',
+                    gap: window.innerWidth < 640 ? '8px' : '12px'
+                  }}
+                  formatter={(value, entry: any) => {
+                    const data = entry.payload;
+                    const percent = data && expensesByCategory ? 
+                      ((data.amount / expensesByCategory.reduce((sum: number, item: any) => sum + item.amount, 0)) * 100).toFixed(1) : '0';
+                    return (
+                      <span style={{
+                        fontSize: window.innerWidth < 640 ? '10px' : '12px',
+                        fontWeight: '500',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}>
+                        <span>{value}:</span>
+                        <span style={{ fontWeight: '700' }}>{percent}%</span>
+                      </span>
+                    );
+                  }}
                 />
               </RechartsPieChart>
             </ResponsiveContainer>

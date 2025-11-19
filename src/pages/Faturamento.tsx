@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { QuickActions } from "@/components/QuickActions";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -390,38 +391,90 @@ export default function Faturamento() {
 
       <QuickActions />
 
-      {/* Container delimitado com bordas laterais simétricas */}
-      <div className="bg-card rounded-2xl shadow-elegant-lg border-2 border-border/50 overflow-hidden w-full relative mx-auto max-w-full">
-        <div 
-          ref={tableScrollRef} 
-          className="overflow-x-auto w-full faturamento-scroll"
-          style={{ 
-            scrollbarWidth: 'thin',
-            scrollbarColor: 'hsl(var(--primary) / 0.4) transparent'
-          }}
-        >
-          <style>{`
-            .faturamento-scroll {
-              scrollbar-gutter: stable;
-            }
-            .faturamento-scroll::-webkit-scrollbar {
-              height: 12px;
-              display: block;
-            }
-            .faturamento-scroll::-webkit-scrollbar-track {
-              background: hsl(var(--muted) / 0.3);
-              border-radius: 6px;
-              margin: 0 4px;
-            }
-            .faturamento-scroll::-webkit-scrollbar-thumb {
-              background: hsl(var(--primary) / 0.4);
-              border-radius: 6px;
-            }
-            .faturamento-scroll::-webkit-scrollbar-thumb:hover {
-              background: hsl(var(--primary) / 0.6);
-            }
-          `}</style>
-          <Table className="w-full min-w-max text-xs sm:text-sm border-separate border-spacing-0 min-w-[1200px]">
+      {/* Mobile: Cards verticais | Desktop: Tabela */}
+      {isMobile ? (
+        <div className="space-y-4">
+          {billingData.length === 0 ? (
+            <Card className="p-8 text-center">
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-16 h-16 rounded-full bg-muted/30 border-2 border-border/50 flex items-center justify-center">
+                  <span className="text-2xl">📊</span>
+                </div>
+                <span className="font-medium text-muted-foreground">Nenhuma receita cadastrada encontrada</span>
+              </div>
+            </Card>
+          ) : (
+            billingData.map((item, index) => (
+              <Card key={item.category} className="border border-border/50 shadow-sm">
+                <CardContent className="p-4">
+                  <h3 className="font-bold text-base mb-3 text-foreground border-b border-border/30 pb-2">
+                    {formatCategoryLabel(item.category)}
+                  </h3>
+                  <div className="space-y-2">
+                    {months.filter(m => m.key !== 'TOTAL' && item.monthlyData[m.key]).map((month) => (
+                      <div key={month.key} className="flex justify-between items-center py-1.5 border-b border-border/10 last:border-0">
+                        <span className="text-xs text-muted-foreground">{month.label}</span>
+                        <span className="text-sm font-semibold text-success">
+                          {formatCurrency(item.monthlyData[month.key])}
+                        </span>
+                      </div>
+                    ))}
+                    <div className="flex justify-between items-center pt-2 mt-2 border-t-2 border-primary/30">
+                      <span className="text-sm font-bold text-foreground">Total</span>
+                      <span className="text-base font-bold text-success">
+                        {formatCurrency(item.total)}
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+          {billingData.length > 0 && (
+            <Card className="border-2 border-primary/50 bg-primary/5">
+              <CardContent className="p-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-base font-bold text-foreground">TOTAL GERAL</span>
+                  <span className="text-lg font-bold text-success">
+                    {formatCurrency(grandTotal)}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      ) : (
+        <div className="bg-card rounded-2xl shadow-elegant-lg border-2 border-border/50 overflow-hidden w-full relative mx-auto max-w-full">
+          <div 
+            ref={tableScrollRef} 
+            className="overflow-x-auto w-full faturamento-scroll"
+            style={{ 
+              scrollbarWidth: 'thin',
+              scrollbarColor: 'hsl(var(--primary) / 0.4) transparent'
+            }}
+          >
+            <style>{`
+              .faturamento-scroll {
+                scrollbar-gutter: stable;
+              }
+              .faturamento-scroll::-webkit-scrollbar {
+                height: 12px;
+                display: block;
+              }
+              .faturamento-scroll::-webkit-scrollbar-track {
+                background: hsl(var(--muted) / 0.3);
+                border-radius: 6px;
+                margin: 0 4px;
+              }
+              .faturamento-scroll::-webkit-scrollbar-thumb {
+                background: hsl(var(--primary) / 0.4);
+                border-radius: 6px;
+              }
+              .faturamento-scroll::-webkit-scrollbar-thumb:hover {
+                background: hsl(var(--primary) / 0.6);
+              }
+            `}</style>
+            <Table className="w-full min-w-max text-xs sm:text-sm border-separate border-spacing-0 min-w-[1200px]">
             <TableHeader>
               <TableRow className="border-b-2 border-primary/30 hover:bg-transparent">
                 <TableHead className="sticky left-0 z-10 bg-gradient-to-r from-muted/40 to-muted/30 backdrop-blur-sm min-w-[60px] sm:min-w-[75px] md:min-w-[100px] max-w-[60px] sm:max-w-[75px] md:max-w-[100px] text-center text-xs sm:text-sm px-2 sm:px-4 font-bold border-r border-border/50 rounded-tl-xl">
@@ -499,9 +552,10 @@ export default function Faturamento() {
                 </>
               )}
             </TableBody>
-          </Table>
+            </Table>
+          </div>
         </div>
-      </div>
+      )}
 
     </div>
   );

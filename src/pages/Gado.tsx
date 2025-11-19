@@ -40,6 +40,7 @@ export default function Gado() {
   const queryClient = useQueryClient();
 
   const [formData, setFormData] = useState({
+    description: "",
     category: "Fêmea",
     origin: "Mato Grosso (MT)",
     quantity: "",
@@ -122,6 +123,7 @@ export default function Gado() {
       toast({ title: "Gado cadastrado com sucesso!" });
       if (keepDialogOpen) {
         setFormData({
+          description: "",
           category: "Fêmea",
           origin: "Mato Grosso (MT)",
           quantity: "",
@@ -290,13 +292,11 @@ export default function Gado() {
 
   const handleSubmitLogic = async () => {
     const data = {
-      ...formData,
-      breed: formData.breed ? standardizeText(formData.breed) : null,
+      description: formData.description ? standardizeText(formData.description) : null,
       category: formData.category ? standardizeText(formData.category) : null,
       location: formData.location ? standardizeText(formData.location) : null,
       origin: formData.origin ? standardizeText(formData.origin) : null,
       health_status: formData.health_status ? standardizeText(formData.health_status) : null,
-      identification: formData.identification ? standardizeText(formData.identification) : null,
       quantity: formData.quantity ? parseInt(formData.quantity) : 1,
       age_months: formData.age_months ? parseInt(formData.age_months) : null,
       purchase_price: formData.purchase_price ? parseFloat(formData.purchase_price) : null,
@@ -313,6 +313,7 @@ export default function Gado() {
   const handleEdit = (item: any) => {
     setEditingId(item.id);
     setFormData({
+      description: item.description || "",
       category: item.category,
       origin: item.origin,
       quantity: item.quantity.toString(),
@@ -329,6 +330,7 @@ export default function Gado() {
     setIsDialogOpen(false);
     setEditingId(null);
     setFormData({
+      description: "",
       category: "Fêmea",
       origin: "Mato Grosso (MT)",
       quantity: "",
@@ -343,6 +345,7 @@ export default function Gado() {
   const handleNewItem = () => {
     setEditingId(null);
     setFormData({
+      description: "",
       category: "Fêmea",
       origin: "Mato Grosso (MT)",
       quantity: "",
@@ -479,7 +482,8 @@ export default function Gado() {
         <Table className="w-full border-separate border-spacing-0 min-w-[1200px]">
           <TableHeader>
             <TableRow className="border-b-2 border-primary/30 hover:bg-transparent">
-              <TableHead className="bg-gradient-to-r from-primary/10 to-primary/5 backdrop-blur-sm font-bold border-r border-border/50 rounded-tl-xl px-1.5 sm:px-2 text-xs text-center">Categoria</TableHead>
+              <TableHead className="bg-gradient-to-r from-primary/10 to-primary/5 backdrop-blur-sm font-bold border-r border-border/50 rounded-tl-xl px-1.5 sm:px-2 text-xs text-center">Descrição</TableHead>
+              <TableHead className="bg-gradient-to-r from-primary/10 to-primary/5 backdrop-blur-sm font-bold border-r border-border/50 px-1.5 sm:px-2 text-xs text-center">Categoria</TableHead>
               <TableHead className="bg-gradient-to-r from-primary/10 to-primary/5 backdrop-blur-sm font-bold border-r border-border/50 px-1.5 sm:px-2 text-xs text-center">Origem</TableHead>
               <TableHead className="bg-gradient-to-r from-primary/10 to-primary/5 backdrop-blur-sm font-bold border-r border-border/50 px-1.5 sm:px-2 text-xs text-center">Quantidade</TableHead>
               <TableHead className="bg-gradient-to-r from-primary/10 to-primary/5 backdrop-blur-sm font-bold border-r border-border/50 px-1.5 sm:px-2 text-xs text-center">Idade (meses)</TableHead>
@@ -493,7 +497,7 @@ export default function Gado() {
           <TableBody>
             {sortedCattle?.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-12 text-muted-foreground/70 border-0">
+                <TableCell colSpan={10} className="text-center py-12 text-muted-foreground/70 border-0">
                   <div className="flex flex-col items-center gap-2">
                     <div className="w-16 h-16 rounded-full bg-muted/30 border-2 border-border/50 flex items-center justify-center">
                       <span className="text-2xl">🐄</span>
@@ -559,6 +563,23 @@ export default function Gado() {
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={(e) => { e.preventDefault(); handleSubmit(e); }} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="description">Descrição *</Label>
+              <Input
+                id="description"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onBlur={(e) => handleStandardizeInput(e.target.value, (value) => setFormData({ ...formData, description: value }))}
+                placeholder="Ex: Lote de Novilhas - Fazenda São João"
+                required
+              />
+              <p className="text-xs text-muted-foreground">Identifique o lote de forma clara</p>
+            </div>
+            
+            <div className="pt-2 border-t">
+              <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Detalhes do Lote</h3>
+            </div>
+            
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-4">
               <div className="space-y-2">
                 <Label htmlFor="category">Categoria</Label>
@@ -653,11 +674,6 @@ export default function Gado() {
               <Button type="button" variant="outline" onClick={handleCloseDialog}>
                 Cancelar
               </Button>
-              {!editingId && (
-                <Button type="button" variant="outline" onClick={handleSubmitAndNew}>
-                  Cadastrar Novo
-                </Button>
-              )}
               <Button type="submit">
                 {editingId ? "Atualizar" : "Cadastrar"}
               </Button>
