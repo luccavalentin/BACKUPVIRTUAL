@@ -12,7 +12,7 @@ const fs = require('fs');
 const path = require('path');
 
 const sizes = [192, 512];
-const inputSvg = path.join(__dirname, '../public/logo.svg');
+const inputSvg = path.join(__dirname, '../public/icons/icon.svg');
 const outputDir = path.join(__dirname, '../public/icons');
 
 // Verifica se o arquivo SVG existe

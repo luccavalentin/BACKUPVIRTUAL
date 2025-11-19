@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerador de Ícones PWA</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #1e3a8a;
+      margin-bottom: 20px;
+    }
+    .preview {
+      display: flex;
+      gap: 20px;
+      margin: 20px 0;
+    }
+    canvas {
+      border: 2px solid #ddd;
+      border-radius: 8px;
+    }
+    button {
+      background: #1e3a8a;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px 5px;
+    }
+    button:hover {
+      background: #1e40af;
+    }
+    .instructions {
+      background: #e0f2fe;
+      padding: 15px;
+      border-radius: 6px;
+      margin: 20px 0;
+      border-left: 4px solid #1e3a8a;
+    }
+    .success {
+      background: #d1fae5;
+      color: #065f46;
+      padding: 10px;
+      border-radius: 6px;
+      margin: 10px 0;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 Gerador de Ícones PWA</h1>
+    
+    <div class="instructions">
+      <strong>Instruções:</strong>
+      <ol>
+        <li>Clique em "Gerar Ícones" para criar os ícones</li>
+        <li>Clique em "Download 192x192" e "Download 512x512" para baixar</li>
+        <li>Salve os arquivos em: <code>public/icons/</code></li>
+        <li>Renomeie para: <code>icon-192x192.png</code> e <code>icon-512x512.png</code></li>
+      </ol>
+    </div>
+
+    <button onclick="generateIcons()">Gerar Ícones</button>
+    
+    <div class="preview">
+      <div>
+        <h3>192x192</h3>
+        <canvas id="canvas192" width="192" height="192"></canvas>
+        <br>
+        <button onclick="downloadIcon(192)" id="btn192" disabled>Download 192x192</button>
+      </div>
+      <div>
+        <h3>512x512</h3>
+        <canvas id="canvas512" width="512" height="512"></canvas>
+        <br>
+        <button onclick="downloadIcon(512)" id="btn512" disabled>Download 512x512</button>
+      </div>
+    </div>
+
+    <div class="success" id="success">
+      ✅ Ícones gerados com sucesso! Faça o download e salve em public/icons/
+    </div>
+  </div>
+
+  <script>
+    function generateIcon(size) {
+      const canvas = document.getElementById('canvas' + size);
+      const ctx = canvas.getContext('2d');
+      
+      // Fundo azul (#1e3a8a)
+      ctx.fillStyle = '#1e3a8a';
+      ctx.fillRect(0, 0, size, size);
+      
+      // Círculo central com gradiente
+      const center = size / 2;
+      const radius = size * 0.4;
+      
+      // Gradiente
+      const gradient = ctx.createRadialGradient(center, center, 0, center, center, radius);
+      gradient.addColorStop(0, '#3b82f6');
+      gradient.addColorStop(1, '#1e40af');
+      
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(center, center, radius, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Símbolo de dólar branco
+      ctx.strokeStyle = 'white';
+      ctx.fillStyle = 'white';
+      ctx.lineWidth = size / 25;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      
+      const lineWidth = size / 25;
+      const dollarWidth = size * 0.15;
+      const dollarHeight = size * 0.3;
+      
+      // Linha vertical central
+      ctx.beginPath();
+      ctx.moveTo(center, center - dollarHeight);
+      ctx.lineTo(center, center + dollarHeight);
+      ctx.stroke();
+      
+      // S superior
+      ctx.beginPath();
+      ctx.arc(center, center - dollarHeight * 0.3, dollarWidth * 0.6, Math.PI / 2, Math.PI * 1.5, false);
+      ctx.stroke();
+      
+      // S inferior
+      ctx.beginPath();
+      ctx.arc(center, center + dollarHeight * 0.3, dollarWidth * 0.6, Math.PI * 1.5, Math.PI / 2, false);
+      ctx.stroke();
+      
+      // Linhas horizontais
+      ctx.beginPath();
+      ctx.moveTo(center - dollarWidth * 0.4, center - dollarHeight * 0.6);
+      ctx.lineTo(center + dollarWidth * 0.4, center - dollarHeight * 0.6);
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.moveTo(center - dollarWidth * 0.4, center + dollarHeight * 0.6);
+      ctx.lineTo(center + dollarWidth * 0.4, center + dollarHeight * 0.6);
+      ctx.stroke();
+      
+      return canvas;
+    }
+    
+    function generateIcons() {
+      generateIcon(192);
+      generateIcon(512);
+      
+      document.getElementById('btn192').disabled = false;
+      document.getElementById('btn512').disabled = false;
+      document.getElementById('success').style.display = 'block';
+    }
+    
+    function downloadIcon(size) {
+      const canvas = document.getElementById('canvas' + size);
+      const link = document.createElement('a');
+      link.download = `icon-${size}x${size}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+    
+    // Gera automaticamente ao carregar
+    window.onload = function() {
+      generateIcons();
+    };
+  </script>
+</body>
+</html>
+
