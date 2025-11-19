@@ -479,18 +479,18 @@ export default function Faturamento() {
             <TableHeader>
               <TableRow className="border-b-2 border-primary/30 hover:bg-transparent bg-primary">
                 <TableHead className="sticky left-0 z-10 bg-primary text-primary-foreground min-w-[60px] sm:min-w-[75px] md:min-w-[100px] max-w-[60px] sm:max-w-[75px] md:max-w-[100px] text-center text-xs sm:text-sm px-2 sm:px-4 font-bold border-r border-primary/50 rounded-tl-xl">
-                  Descrição
+                  <span className="text-primary-foreground font-extrabold">DESCRIÇÃO</span>
                 </TableHead>
                 {months.map((month, index) => (
                   <TableHead 
                     key={month.key} 
-                    className="text-center min-w-[90px] sm:min-w-[100px] md:min-w-[120px] text-xs sm:text-sm px-1 sm:px-2 font-semibold bg-gradient-to-b from-primary/10 to-transparent border-r border-border/30"
+                    className="text-center min-w-[90px] sm:min-w-[100px] md:min-w-[120px] text-xs sm:text-sm px-1 sm:px-2 font-semibold bg-primary text-primary-foreground border-r border-primary/30"
                   >
-                      <span className="whitespace-nowrap">{month.label}</span>
+                      <span className="whitespace-nowrap text-primary-foreground font-bold">{month.label}</span>
                   </TableHead>
                 ))}
-                <TableHead className="text-center font-bold bg-gradient-to-r from-primary/10 to-primary/5 min-w-[90px] sm:min-w-[100px] md:min-w-[120px] sticky right-0 z-10 text-xs sm:text-sm px-2 sm:px-4 border-l-2 border-primary/30 rounded-tr-xl">
-                  Total
+                <TableHead className="text-center font-bold bg-primary text-primary-foreground min-w-[90px] sm:min-w-[100px] md:min-w-[120px] sticky right-0 z-10 text-xs sm:text-sm px-2 sm:px-4 border-l-2 border-primary/50 rounded-tr-xl">
+                  <span className="text-primary-foreground font-extrabold">TOTAL</span>
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -510,15 +510,15 @@ export default function Faturamento() {
                 <>
                   {billingData.map((item, index) => (
                     <TableRow key={item.category} className={`border-b border-border/30 hover:bg-muted/20 transition-colors ${index % 2 === 0 ? "bg-card" : "bg-muted/5"}`}>
-                      <TableCell className="font-semibold sticky left-0 z-10 bg-card text-xs sm:text-sm px-2 sm:px-4 border-r border-border/30 max-w-[60px] sm:max-w-[75px] md:max-w-[100px]">
-                        <span className="block break-words whitespace-pre-wrap hyphens-auto leading-tight text-center text-foreground/90">
+                      <TableCell className="font-semibold sticky left-0 z-10 bg-primary text-primary-foreground text-xs sm:text-sm px-2 sm:px-4 border-r border-primary/30 max-w-[60px] sm:max-w-[75px] md:max-w-[100px]">
+                        <span className="block break-words whitespace-pre-wrap hyphens-auto leading-tight text-center text-primary-foreground font-bold">
                           {formatCategoryLabel(item.category)}
                         </span>
                       </TableCell>
                       {months.map((month) => (
                         <TableCell 
                           key={month.key} 
-                          className="text-center font-medium text-xs sm:text-sm px-1 sm:px-2 border-r border-border/20"
+                          className="text-center font-medium text-xs sm:text-sm px-1 sm:px-2 border-r border-border/20 bg-card"
                         >
                           {item.monthlyData[month.key] ? (
                             <span className="text-success font-semibold whitespace-nowrap">
@@ -529,8 +529,8 @@ export default function Faturamento() {
                           )}
                         </TableCell>
                       ))}
-                      <TableCell className="text-center font-bold text-success bg-primary border-l-2 border-primary/30 sticky right-0 z-10 text-xs sm:text-sm px-2 sm:px-4 text-primary-foreground" style={{ right: 0 }}>
-                        <span className="whitespace-nowrap">{formatCurrency(item.total)}</span>
+                      <TableCell className="text-center font-bold bg-primary border-l-2 border-primary/50 sticky right-0 z-10 text-xs sm:text-sm px-2 sm:px-4 text-primary-foreground" style={{ right: 0 }}>
+                        <span className="whitespace-nowrap font-extrabold">{formatCurrency(item.total)}</span>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -541,9 +541,9 @@ export default function Faturamento() {
                     {months.map((month) => (
                       <TableCell 
                         key={month.key} 
-                        className="text-center font-bold bg-primary text-primary-foreground text-xs sm:text-sm px-1 sm:px-2 border-r border-primary/20"
+                        className="text-center font-bold bg-primary text-primary-foreground text-xs sm:text-sm px-1 sm:px-2 border-r border-primary/30"
                       >
-                        <span className="whitespace-nowrap">{formatCurrency(monthlyTotals[month.key] || 0)}</span>
+                        <span className="whitespace-nowrap font-extrabold">{formatCurrency(monthlyTotals[month.key] || 0)}</span>
                       </TableCell>
                     ))}
                     <TableCell className="text-center font-bold text-primary-foreground bg-primary border-l-2 border-primary/50 sticky right-0 z-10 text-xs sm:text-sm px-2 sm:px-4 rounded-br-xl" style={{ right: 0 }}>

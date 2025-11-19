@@ -216,7 +216,7 @@ export default function Processos() {
     },
     onSuccess: async (createdProcess, { parcelConfig }) => {
       await queryClient.invalidateQueries({ queryKey: ["legal_processes"] });
-      toast({ title: "Processo cadastrado com sucesso!" });
+      // toast({ title: "Processo cadastrado com sucesso!" });
 
       if (parcelConfig) {
         try {

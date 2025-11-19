@@ -128,7 +128,7 @@ export default function Clientes() {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["clients"] });
-      toast({ title: "Cliente cadastrado com sucesso!" });
+      // toast({ title: "Cliente cadastrado com sucesso!" });
       handleCloseDialog();
     },
     onError: (error: any) => {

@@ -120,7 +120,7 @@ export default function Gado() {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["cattle"] });
-      toast({ title: "Gado cadastrado com sucesso!" });
+      // toast({ title: "Gado cadastrado com sucesso!" });
       if (keepDialogOpen) {
         setFormData({
           description: "",

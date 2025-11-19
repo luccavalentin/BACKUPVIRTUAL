@@ -95,7 +95,7 @@ export default function Leads() {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["leads"] });
-      toast({ title: "Lead cadastrado com sucesso!" });
+      // toast({ title: "Lead cadastrado com sucesso!" });
       if (keepDialogOpen) {
         setFormData({
           name: "",

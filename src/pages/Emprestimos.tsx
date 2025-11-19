@@ -220,7 +220,7 @@ export default function Emprestimos() {
     },
     onSuccess: async (loan, { scheduleConfig }) => {
       await queryClient.invalidateQueries({ queryKey: ["loans"] });
-      toast({ title: "Registro cadastrado com sucesso!" });
+      // toast({ title: "Registro cadastrado com sucesso!" });
 
       if (scheduleConfig && scheduleConfig.totalAmount > 0) {
         try {

@@ -3296,9 +3296,8 @@ export default function Dashboard() {
                         overflow: 'visible',
                         lineHeight: '1.8'
                       }}
-                      formatter={(value, entry: any) => {
+                      formatter={(value, entry: any, index: number) => {
                         const data = entry.payload;
-                        const itemIndex = comparisonRevenueByCategory1 ? comparisonRevenueByCategory1.findIndex((item: any) => item.category === value) : -1;
                         const total = comparisonRevenueByCategory1 ? comparisonRevenueByCategory1.reduce((sum: number, item: any) => sum + item.amount, 0) : 0;
                         const percent = data && total > 0 ? ((data.amount / total) * 100).toFixed(1) : '0';
                         const formattedValue = formatCurrency(data.amount || 0);
@@ -3310,18 +3309,19 @@ export default function Dashboard() {
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
-                            gap: '4px',
+                            gap: '6px',
                             whiteSpace: 'normal',
                             wordBreak: 'break-word',
                             lineHeight: '1.6',
                             textAlign: 'center',
-                            marginBottom: window.innerWidth < 640 ? '8px' : '10px',
-                            padding: '4px 8px'
+                            marginBottom: window.innerWidth < 640 ? '12px' : '14px',
+                            padding: '6px 10px',
+                            minWidth: window.innerWidth < 640 ? '120px' : '140px'
                           }}>
-                            <span style={{ fontWeight: '700', fontSize: window.innerWidth < 640 ? '12px' : '14px' }}>
-                              Item {itemIndex >= 0 ? itemIndex : 'N/A'} &gt; {categoryName}
+                            <span style={{ fontWeight: '700', fontSize: window.innerWidth < 640 ? '12px' : '14px', color: 'hsl(var(--foreground))' }}>
+                              {categoryName}
                             </span>
-                            <span style={{ fontWeight: '700', color: 'hsl(var(--primary))', fontSize: window.innerWidth < 640 ? '12px' : '14px' }}>
+                            <span style={{ fontWeight: '800', color: 'hsl(var(--primary))', fontSize: window.innerWidth < 640 ? '13px' : '15px' }}>
                               R$ {formattedValue.replace('R$', '').trim()}
                             </span>
                             <span style={{ fontWeight: '600', color: 'hsl(var(--muted-foreground))', fontSize: window.innerWidth < 640 ? '10px' : '12px' }}>
@@ -3398,9 +3398,8 @@ export default function Dashboard() {
                         overflow: 'visible',
                         lineHeight: '1.8'
                       }}
-                      formatter={(value, entry: any) => {
+                      formatter={(value, entry: any, index: number) => {
                         const data = entry.payload;
-                        const itemIndex = comparisonExpensesByCategory1 ? comparisonExpensesByCategory1.findIndex((item: any) => item.category === value) : -1;
                         const total = comparisonExpensesByCategory1 ? comparisonExpensesByCategory1.reduce((sum: number, item: any) => sum + item.amount, 0) : 0;
                         const percent = data && total > 0 ? ((data.amount / total) * 100).toFixed(1) : '0';
                         const formattedValue = formatCurrency(data.amount || 0);
@@ -3412,18 +3411,19 @@ export default function Dashboard() {
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
-                            gap: '4px',
+                            gap: '6px',
                             whiteSpace: 'normal',
                             wordBreak: 'break-word',
                             lineHeight: '1.6',
                             textAlign: 'center',
-                            marginBottom: window.innerWidth < 640 ? '8px' : '10px',
-                            padding: '4px 8px'
+                            marginBottom: window.innerWidth < 640 ? '12px' : '14px',
+                            padding: '6px 10px',
+                            minWidth: window.innerWidth < 640 ? '120px' : '140px'
                           }}>
-                            <span style={{ fontWeight: '700', fontSize: window.innerWidth < 640 ? '12px' : '14px' }}>
-                              Item {itemIndex >= 0 ? itemIndex : 'N/A'} &gt; {categoryName}
+                            <span style={{ fontWeight: '700', fontSize: window.innerWidth < 640 ? '12px' : '14px', color: 'hsl(var(--foreground))' }}>
+                              {categoryName}
                             </span>
-                            <span style={{ fontWeight: '700', color: 'hsl(var(--destructive))', fontSize: window.innerWidth < 640 ? '12px' : '14px' }}>
+                            <span style={{ fontWeight: '800', color: 'hsl(var(--destructive))', fontSize: window.innerWidth < 640 ? '13px' : '15px' }}>
                               R$ {formattedValue.replace('R$', '').trim()}
                             </span>
                             <span style={{ fontWeight: '600', color: 'hsl(var(--muted-foreground))', fontSize: window.innerWidth < 640 ? '10px' : '12px' }}>
@@ -3503,9 +3503,8 @@ export default function Dashboard() {
                         overflow: 'visible',
                         lineHeight: '1.8'
                       }}
-                      formatter={(value, entry: any) => {
+                      formatter={(value, entry: any, index: number) => {
                         const data = entry.payload;
-                        const itemIndex = comparisonRevenueByCategory2 ? comparisonRevenueByCategory2.findIndex((item: any) => item.category === value) : -1;
                         const total = comparisonRevenueByCategory2 ? comparisonRevenueByCategory2.reduce((sum: number, item: any) => sum + item.amount, 0) : 0;
                         const percent = data && total > 0 ? ((data.amount / total) * 100).toFixed(1) : '0';
                         const formattedValue = formatCurrency(data.amount || 0);
@@ -3517,18 +3516,19 @@ export default function Dashboard() {
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
-                            gap: '4px',
+                            gap: '6px',
                             whiteSpace: 'normal',
                             wordBreak: 'break-word',
                             lineHeight: '1.6',
                             textAlign: 'center',
-                            marginBottom: window.innerWidth < 640 ? '8px' : '10px',
-                            padding: '4px 8px'
+                            marginBottom: window.innerWidth < 640 ? '12px' : '14px',
+                            padding: '6px 10px',
+                            minWidth: window.innerWidth < 640 ? '120px' : '140px'
                           }}>
-                            <span style={{ fontWeight: '700', fontSize: window.innerWidth < 640 ? '12px' : '14px' }}>
-                              Item {itemIndex >= 0 ? itemIndex : 'N/A'} &gt; {categoryName}
+                            <span style={{ fontWeight: '700', fontSize: window.innerWidth < 640 ? '12px' : '14px', color: 'hsl(var(--foreground))' }}>
+                              {categoryName}
                             </span>
-                            <span style={{ fontWeight: '700', color: 'hsl(var(--primary))', fontSize: window.innerWidth < 640 ? '12px' : '14px' }}>
+                            <span style={{ fontWeight: '800', color: 'hsl(var(--primary))', fontSize: window.innerWidth < 640 ? '13px' : '15px' }}>
                               R$ {formattedValue.replace('R$', '').trim()}
                             </span>
                             <span style={{ fontWeight: '600', color: 'hsl(var(--muted-foreground))', fontSize: window.innerWidth < 640 ? '10px' : '12px' }}>
@@ -3605,9 +3605,8 @@ export default function Dashboard() {
                         overflow: 'visible',
                         lineHeight: '1.8'
                       }}
-                      formatter={(value, entry: any) => {
+                      formatter={(value, entry: any, index: number) => {
                         const data = entry.payload;
-                        const itemIndex = comparisonExpensesByCategory2 ? comparisonExpensesByCategory2.findIndex((item: any) => item.category === value) : -1;
                         const total = comparisonExpensesByCategory2 ? comparisonExpensesByCategory2.reduce((sum: number, item: any) => sum + item.amount, 0) : 0;
                         const percent = data && total > 0 ? ((data.amount / total) * 100).toFixed(1) : '0';
                         const formattedValue = formatCurrency(data.amount || 0);
@@ -3619,18 +3618,19 @@ export default function Dashboard() {
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
-                            gap: '4px',
+                            gap: '6px',
                             whiteSpace: 'normal',
                             wordBreak: 'break-word',
                             lineHeight: '1.6',
                             textAlign: 'center',
-                            marginBottom: window.innerWidth < 640 ? '8px' : '10px',
-                            padding: '4px 8px'
+                            marginBottom: window.innerWidth < 640 ? '12px' : '14px',
+                            padding: '6px 10px',
+                            minWidth: window.innerWidth < 640 ? '120px' : '140px'
                           }}>
-                            <span style={{ fontWeight: '700', fontSize: window.innerWidth < 640 ? '12px' : '14px' }}>
-                              Item {itemIndex >= 0 ? itemIndex : 'N/A'} &gt; {categoryName}
+                            <span style={{ fontWeight: '700', fontSize: window.innerWidth < 640 ? '12px' : '14px', color: 'hsl(var(--foreground))' }}>
+                              {categoryName}
                             </span>
-                            <span style={{ fontWeight: '700', color: 'hsl(var(--destructive))', fontSize: window.innerWidth < 640 ? '12px' : '14px' }}>
+                            <span style={{ fontWeight: '800', color: 'hsl(var(--destructive))', fontSize: window.innerWidth < 640 ? '13px' : '15px' }}>
                               R$ {formattedValue.replace('R$', '').trim()}
                             </span>
                             <span style={{ fontWeight: '600', color: 'hsl(var(--muted-foreground))', fontSize: window.innerWidth < 640 ? '10px' : '12px' }}>
@@ -3711,9 +3711,8 @@ export default function Dashboard() {
                       overflow: 'visible',
                       lineHeight: '1.8'
                     }}
-                    formatter={(value, entry: any) => {
+                    formatter={(value, entry: any, index: number) => {
                       const data = entry.payload;
-                      const itemIndex = revenueByCategory ? revenueByCategory.findIndex((item: any) => item.category === value) : -1;
                       const total = revenueByCategory ? revenueByCategory.reduce((sum: number, item: any) => sum + item.amount, 0) : 0;
                       const percent = data && total > 0 ? ((data.amount / total) * 100).toFixed(1) : '0';
                       const formattedValue = formatCurrency(data.amount || 0);
@@ -3725,18 +3724,19 @@ export default function Dashboard() {
                           display: 'flex',
                           flexDirection: 'column',
                           alignItems: 'center',
-                          gap: '4px',
+                          gap: '6px',
                           whiteSpace: 'normal',
                           wordBreak: 'break-word',
                           lineHeight: '1.6',
                           textAlign: 'center',
-                          marginBottom: window.innerWidth < 640 ? '8px' : '10px',
-                          padding: '4px 8px'
+                          marginBottom: window.innerWidth < 640 ? '12px' : '14px',
+                          padding: '6px 10px',
+                          minWidth: window.innerWidth < 640 ? '120px' : '140px'
                         }}>
-                          <span style={{ fontWeight: '700', fontSize: window.innerWidth < 640 ? '12px' : '14px' }}>
-                            Item {itemIndex >= 0 ? itemIndex : 'N/A'} &gt; {categoryName}
+                          <span style={{ fontWeight: '700', fontSize: window.innerWidth < 640 ? '12px' : '14px', color: 'hsl(var(--foreground))' }}>
+                            {categoryName}
                           </span>
-                          <span style={{ fontWeight: '700', color: 'hsl(var(--primary))', fontSize: window.innerWidth < 640 ? '12px' : '14px' }}>
+                          <span style={{ fontWeight: '800', color: 'hsl(var(--primary))', fontSize: window.innerWidth < 640 ? '13px' : '15px' }}>
                             R$ {formattedValue.replace('R$', '').trim()}
                           </span>
                           <span style={{ fontWeight: '600', color: 'hsl(var(--muted-foreground))', fontSize: window.innerWidth < 640 ? '10px' : '12px' }}>
@@ -3814,9 +3814,8 @@ export default function Dashboard() {
                       overflow: 'visible',
                       lineHeight: '1.8'
                     }}
-                    formatter={(value, entry: any) => {
+                    formatter={(value, entry: any, index: number) => {
                       const data = entry.payload;
-                      const itemIndex = expensesByCategory ? expensesByCategory.findIndex((item: any) => item.category === value) : -1;
                       const total = expensesByCategory ? expensesByCategory.reduce((sum: number, item: any) => sum + item.amount, 0) : 0;
                       const percent = data && total > 0 ? ((data.amount / total) * 100).toFixed(1) : '0';
                       const formattedValue = formatCurrency(data.amount || 0);
@@ -3828,18 +3827,19 @@ export default function Dashboard() {
                           display: 'flex',
                           flexDirection: 'column',
                           alignItems: 'center',
-                          gap: '4px',
+                          gap: '6px',
                           whiteSpace: 'normal',
                           wordBreak: 'break-word',
                           lineHeight: '1.6',
                           textAlign: 'center',
-                          marginBottom: window.innerWidth < 640 ? '8px' : '10px',
-                          padding: '4px 8px'
+                          marginBottom: window.innerWidth < 640 ? '12px' : '14px',
+                          padding: '6px 10px',
+                          minWidth: window.innerWidth < 640 ? '120px' : '140px'
                         }}>
-                          <span style={{ fontWeight: '700', fontSize: window.innerWidth < 640 ? '12px' : '14px' }}>
-                            Item {itemIndex >= 0 ? itemIndex : 'N/A'} &gt; {categoryName}
+                          <span style={{ fontWeight: '700', fontSize: window.innerWidth < 640 ? '12px' : '14px', color: 'hsl(var(--foreground))' }}>
+                            {categoryName}
                           </span>
-                          <span style={{ fontWeight: '700', color: 'hsl(var(--destructive))', fontSize: window.innerWidth < 640 ? '12px' : '14px' }}>
+                          <span style={{ fontWeight: '800', color: 'hsl(var(--destructive))', fontSize: window.innerWidth < 640 ? '13px' : '15px' }}>
                             R$ {formattedValue.replace('R$', '').trim()}
                           </span>
                           <span style={{ fontWeight: '600', color: 'hsl(var(--muted-foreground))', fontSize: window.innerWidth < 640 ? '10px' : '12px' }}>

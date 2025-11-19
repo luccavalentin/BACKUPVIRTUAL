@@ -566,7 +566,7 @@ export default function Imoveis() {
         const insertedProperty = await createMutation.mutateAsync(data);
         propertyId = insertedProperty.id;
         await queryClient.invalidateQueries({ queryKey: ["properties"] });
-        toast({ title: "Imóvel cadastrado com sucesso!" });
+        // toast({ title: "Imóvel cadastrado com sucesso!" });
       }
 
       // Gerar despesas se necessário
