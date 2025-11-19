@@ -2217,20 +2217,20 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="overflow-visible">
+    <div className="w-full max-w-full overflow-x-hidden">
       <TaskNotificationDialog />
-      <div className="flex flex-col items-center justify-center text-center mb-8 md:mb-10 relative">
+      <div className="flex flex-col items-center justify-center text-center mb-6 sm:mb-8 md:mb-10 relative w-full max-w-full px-2 sm:px-4">
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="w-64 h-64 bg-primary/5 rounded-full blur-3xl opacity-50" />
+          <div className="w-48 h-48 sm:w-64 sm:h-64 bg-primary/5 rounded-full blur-3xl opacity-50" />
         </div>
-        <div className="relative z-10 w-full">
-          <h1 className="text-3xl md:text-5xl font-extrabold text-primary tracking-tight mb-3">
+        <div className="relative z-10 w-full max-w-full">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-primary tracking-tight mb-2 sm:mb-3">
             Dashboard
           </h1>
-          <p className="text-muted-foreground text-base md:text-lg font-medium max-w-2xl mx-auto px-4 leading-relaxed mb-4">
+          <p className="text-muted-foreground text-sm sm:text-base md:text-lg font-medium max-w-2xl mx-auto px-2 sm:px-4 leading-relaxed mb-3 sm:mb-4">
             Visão geral do seu negócio
           </p>
-          <div className="flex items-center justify-center gap-2 md:gap-3 mb-6 flex-wrap">
+          <div className="flex items-center justify-center gap-2 sm:gap-2 md:gap-3 mb-4 sm:mb-6 flex-wrap w-full max-w-full px-2">
             <Select value={periodFilter} onValueChange={(value) => {
               setPeriodFilter(value as "mensal" | "anual" | "personalizado");
               // Resetar seleções ao mudar o tipo de filtro
@@ -2238,7 +2238,7 @@ export default function Dashboard() {
               setSelectedYear("");
               setCustomDateRange({ from: undefined, to: undefined });
             }}>
-              <SelectTrigger className="w-[200px] h-12 rounded-2xl border-2 border-primary/20 bg-white/85 shadow-[0_8px_24px_rgba(9,9,121,0.08)] hover:border-primary/40 hover:bg-white transition-all duration-300 text-base font-semibold text-foreground/90">
+              <SelectTrigger className="w-full sm:w-[180px] md:w-[200px] h-11 sm:h-12 rounded-2xl border-2 border-primary/20 bg-white/85 shadow-[0_8px_24px_rgba(9,9,121,0.08)] hover:border-primary/40 hover:bg-white transition-all duration-300 text-sm sm:text-base font-semibold text-foreground/90">
                 <SelectValue placeholder="Período" />
               </SelectTrigger>
               <SelectContent>
@@ -2250,7 +2250,7 @@ export default function Dashboard() {
 
             {periodFilter === "mensal" && (
               <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-                <SelectTrigger className="w-[220px] h-12 rounded-2xl border-2 border-primary/20 bg-white/85 shadow-[0_8px_24px_rgba(9,9,121,0.08)] hover:border-primary/40 hover:bg-white transition-all duration-300 text-base font-semibold text-foreground/90">
+                <SelectTrigger className="w-full sm:w-[200px] md:w-[220px] h-11 sm:h-12 rounded-2xl border-2 border-primary/20 bg-white/85 shadow-[0_8px_24px_rgba(9,9,121,0.08)] hover:border-primary/40 hover:bg-white transition-all duration-300 text-sm sm:text-base font-semibold text-foreground/90">
                   <SelectValue placeholder="Selecione o mês" />
                 </SelectTrigger>
                 <SelectContent>
@@ -2265,7 +2265,7 @@ export default function Dashboard() {
 
             {periodFilter === "anual" && (
               <Select value={selectedYear} onValueChange={setSelectedYear}>
-                <SelectTrigger className="w-[180px] h-12 rounded-2xl border-2 border-primary/20 bg-white/85 shadow-[0_8px_24px_rgba(9,9,121,0.08)] hover:border-primary/40 hover:bg-white transition-all duration-300 text-base font-semibold text-foreground/90">
+                <SelectTrigger className="w-full sm:w-[160px] md:w-[180px] h-11 sm:h-12 rounded-2xl border-2 border-primary/20 bg-white/85 shadow-[0_8px_24px_rgba(9,9,121,0.08)] hover:border-primary/40 hover:bg-white transition-all duration-300 text-sm sm:text-base font-semibold text-foreground/90">
                   <SelectValue placeholder="Selecione o ano" />
                 </SelectTrigger>
                 <SelectContent>
@@ -2958,24 +2958,21 @@ export default function Dashboard() {
             <CardHeader className="pb-4">
               <CardTitle className="text-xl font-bold tracking-tight">Receitas vs Despesas</CardTitle>
             </CardHeader>
-            <CardContent className="overflow-visible">
-              <div ref={pieChartRef} className="w-full overflow-x-auto overflow-y-auto break-words sm:overflow-visible">
-                <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 220 : window.innerWidth < 768 ? 280 : 350} className="min-h-[220px] sm:min-h-[280px] md:min-h-[350px]">
-                <PieChart>
+            <CardContent className="overflow-visible pb-4 sm:pb-6">
+              <div ref={pieChartRef} className="w-full overflow-x-auto overflow-y-visible break-words sm:overflow-visible">
+                <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 280 : window.innerWidth < 768 ? 320 : 380} className="min-h-[280px] sm:min-h-[320px] md:min-h-[380px]">
+                <PieChart margin={{ top: 10, right: 10, bottom: window.innerWidth < 640 ? 70 : 50, left: 10 }}>
                   <Pie
                     data={[
                       { name: "Receitas", value: revenueData || 0 },
                       { name: "Despesas", value: expensesData || 0 },
                     ]}
                     cx="50%"
-                    cy="50%"
+                    cy={window.innerWidth < 640 ? "45%" : "50%"}
                     labelLine={false}
-                    label={({ name, percent, value }) => {
-                      if (value === 0) return '';
-                      return `${name}\n${(percent * 100).toFixed(1)}%\n${formatCurrency(value)}`;
-                    }}
-                    outerRadius={100}
-                    innerRadius={40}
+                    label={false}
+                    outerRadius={window.innerWidth < 640 ? 70 : window.innerWidth < 768 ? 85 : 100}
+                    innerRadius={window.innerWidth < 640 ? 30 : 40}
                     fill="#8884d8"
                     dataKey="value"
                     paddingAngle={3}
@@ -2991,7 +2988,8 @@ export default function Dashboard() {
                       border: '1px solid hsl(var(--border))',
                       borderRadius: '0.75rem',
                       padding: '12px',
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                      fontSize: window.innerWidth < 640 ? '11px' : '13px'
                     }}
                     formatter={(value: number, name: string) => [
                       formatCurrency(value),
@@ -2999,23 +2997,26 @@ export default function Dashboard() {
                     ]}
                     labelStyle={{ 
                       fontWeight: 'bold',
-                      fontSize: '14px',
+                      fontSize: window.innerWidth < 640 ? '12px' : '14px',
                       marginBottom: '4px'
                     }}
                   />
                   <Legend 
                     verticalAlign="bottom"
-                    height={window.innerWidth < 640 ? 36 : 48}
+                    height={window.innerWidth < 640 ? 60 : 50}
                     iconType="circle"
                     wrapperStyle={{
-                      paddingTop: window.innerWidth < 640 ? '12px' : '20px',
+                      paddingTop: window.innerWidth < 640 ? '16px' : '20px',
+                      paddingBottom: window.innerWidth < 640 ? '8px' : '0px',
                       fontSize: window.innerWidth < 640 ? '11px' : '13px',
                       fontWeight: '500',
                       display: 'flex',
                       justifyContent: 'center',
-                      gap: '16px',
+                      gap: window.innerWidth < 640 ? '12px' : '16px',
                       flexWrap: 'wrap',
-                      width: '100%'
+                      width: '100%',
+                      maxWidth: '100%',
+                      overflow: 'visible'
                     }}
                     formatter={(value, entry: any) => {
                       const data = entry.payload;
@@ -3030,7 +3031,8 @@ export default function Dashboard() {
                           gap: '6px',
                           whiteSpace: 'normal',
                           wordBreak: 'break-word',
-                          lineHeight: '1.4'
+                          lineHeight: '1.5',
+                          textAlign: 'center'
                         }}>
                           <span>{value}:</span>
                           <span style={{ fontWeight: '700' }}>{formattedValue}</span>
@@ -3160,14 +3162,14 @@ export default function Dashboard() {
                   <span className="text-sm sm:text-base md:text-lg">Receitas por Categoria - Período 1</span>
                 </CardTitle>
           </CardHeader>
-              <CardContent className="overflow-visible px-3 sm:px-6 pb-3 sm:pb-6">
+              <CardContent className="overflow-visible px-3 sm:px-6 pb-4 sm:pb-6">
                 <div ref={comparisonRevenueCategoryChartRef1} className="w-full overflow-visible">
-                  <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 280 : window.innerWidth < 768 ? 320 : getChartHeight()} className={getChartMinHeight()}>
-                    <PieChart>
+                  <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 320 : window.innerWidth < 768 ? 360 : getChartHeight()} className={getChartMinHeight()}>
+                    <PieChart margin={{ top: 10, right: 10, bottom: window.innerWidth < 640 ? 90 : 100, left: 10 }}>
                     <Pie
                       data={comparisonRevenueByCategory1 || []}
                       cx="50%"
-                      cy="50%"
+                      cy={window.innerWidth < 640 ? "45%" : "50%"}
                       labelLine={false}
                       label={false}
                       outerRadius={window.innerWidth < 640 ? 70 : window.innerWidth < 768 ? 85 : 100}
@@ -3199,12 +3201,16 @@ export default function Dashboard() {
                       height={window.innerWidth < 640 ? 80 : 100}
                       iconType="circle"
                       wrapperStyle={{
-                        paddingTop: window.innerWidth < 640 ? '8px' : '12px',
+                        paddingTop: window.innerWidth < 640 ? '12px' : '16px',
+                        paddingBottom: window.innerWidth < 640 ? '8px' : '0px',
                         fontSize: window.innerWidth < 640 ? '10px' : '12px',
                         display: 'flex',
                         flexWrap: 'wrap',
                         justifyContent: 'center',
-                        gap: window.innerWidth < 640 ? '8px' : '12px'
+                        gap: window.innerWidth < 640 ? '8px' : '12px',
+                        width: '100%',
+                        maxWidth: '100%',
+                        overflow: 'visible'
                       }}
                       formatter={(value, entry: any) => {
                         const data = entry.payload;
@@ -3216,7 +3222,11 @@ export default function Dashboard() {
                             fontWeight: '500',
                             display: 'inline-flex',
                             alignItems: 'center',
-                            gap: '4px'
+                            gap: '4px',
+                            whiteSpace: 'normal',
+                            wordBreak: 'break-word',
+                            lineHeight: '1.4',
+                            textAlign: 'center'
                           }}>
                             <span>{value}:</span>
                             <span style={{ fontWeight: '700' }}>{percent}%</span>
@@ -3475,14 +3485,14 @@ export default function Dashboard() {
                 <span className="text-sm sm:text-base md:text-lg">Receitas por Categoria</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="overflow-visible px-3 sm:px-6 pb-3 sm:pb-6">
+            <CardContent className="overflow-visible px-3 sm:px-6 pb-4 sm:pb-6">
               <div ref={revenueCategoryChartRef} className="w-full overflow-visible">
-                <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 280 : window.innerWidth < 768 ? 320 : getChartHeight()} className={getChartMinHeight()}>
-                  <PieChart>
+                <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 320 : window.innerWidth < 768 ? 360 : getChartHeight()} className={getChartMinHeight()}>
+                  <PieChart margin={{ top: 10, right: 10, bottom: window.innerWidth < 640 ? 90 : 100, left: 10 }}>
                   <Pie
                     data={revenueByCategory || []}
                     cx="50%"
-                    cy="50%"
+                    cy={window.innerWidth < 640 ? "45%" : "50%"}
                     labelLine={false}
                     label={false}
                     outerRadius={window.innerWidth < 640 ? 70 : window.innerWidth < 768 ? 85 : 100}
@@ -3514,12 +3524,16 @@ export default function Dashboard() {
                     height={window.innerWidth < 640 ? 80 : 100}
                     iconType="circle"
                     wrapperStyle={{
-                      paddingTop: window.innerWidth < 640 ? '8px' : '12px',
+                      paddingTop: window.innerWidth < 640 ? '12px' : '16px',
+                      paddingBottom: window.innerWidth < 640 ? '8px' : '0px',
                       fontSize: window.innerWidth < 640 ? '10px' : '12px',
                       display: 'flex',
                       flexWrap: 'wrap',
                       justifyContent: 'center',
-                      gap: window.innerWidth < 640 ? '8px' : '12px'
+                      gap: window.innerWidth < 640 ? '8px' : '12px',
+                      width: '100%',
+                      maxWidth: '100%',
+                      overflow: 'visible'
                     }}
                     formatter={(value, entry: any) => {
                       const data = entry.payload;
@@ -3531,7 +3545,11 @@ export default function Dashboard() {
                           fontWeight: '500',
                           display: 'inline-flex',
                           alignItems: 'center',
-                          gap: '4px'
+                          gap: '4px',
+                          whiteSpace: 'normal',
+                          wordBreak: 'break-word',
+                          lineHeight: '1.4',
+                          textAlign: 'center'
                         }}>
                           <span>{value}:</span>
                           <span style={{ fontWeight: '700' }}>{percent}%</span>
@@ -3553,14 +3571,14 @@ export default function Dashboard() {
                 <span className="text-sm sm:text-base md:text-lg">Despesas por Categoria</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="overflow-visible px-3 sm:px-6 pb-3 sm:pb-6">
+            <CardContent className="overflow-visible px-3 sm:px-6 pb-4 sm:pb-6">
               <div ref={expenseCategoryChartRef} className="w-full overflow-visible">
-                <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 280 : window.innerWidth < 768 ? 320 : getChartHeight()} className={getChartMinHeight()}>
-                  <PieChart>
+                <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 320 : window.innerWidth < 768 ? 360 : getChartHeight()} className={getChartMinHeight()}>
+                  <PieChart margin={{ top: 10, right: 10, bottom: window.innerWidth < 640 ? 90 : 100, left: 10 }}>
                   <Pie
                     data={expensesByCategory || []}
                     cx="50%"
-                    cy="50%"
+                    cy={window.innerWidth < 640 ? "45%" : "50%"}
                     labelLine={false}
                     label={false}
                     outerRadius={window.innerWidth < 640 ? 70 : window.innerWidth < 768 ? 85 : 100}
@@ -3592,12 +3610,16 @@ export default function Dashboard() {
                     height={window.innerWidth < 640 ? 80 : 100}
                     iconType="circle"
                     wrapperStyle={{
-                      paddingTop: window.innerWidth < 640 ? '8px' : '12px',
+                      paddingTop: window.innerWidth < 640 ? '12px' : '16px',
+                      paddingBottom: window.innerWidth < 640 ? '8px' : '0px',
                       fontSize: window.innerWidth < 640 ? '10px' : '12px',
                       display: 'flex',
                       flexWrap: 'wrap',
                       justifyContent: 'center',
-                      gap: window.innerWidth < 640 ? '8px' : '12px'
+                      gap: window.innerWidth < 640 ? '8px' : '12px',
+                      width: '100%',
+                      maxWidth: '100%',
+                      overflow: 'visible'
                     }}
                     formatter={(value, entry: any) => {
                       const data = entry.payload;
@@ -3609,7 +3631,11 @@ export default function Dashboard() {
                           fontWeight: '500',
                           display: 'inline-flex',
                           alignItems: 'center',
-                          gap: '4px'
+                          gap: '4px',
+                          whiteSpace: 'normal',
+                          wordBreak: 'break-word',
+                          lineHeight: '1.4',
+                          textAlign: 'center'
                         }}>
                           <span>{value}:</span>
                           <span style={{ fontWeight: '700' }}>{percent}%</span>

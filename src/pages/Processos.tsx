@@ -664,7 +664,7 @@ export default function Processos() {
   };
 
   return (
-    <div>
+    <div className="w-full max-w-full overflow-x-hidden">
       <PageHeader
         title="Escritórios e Processos"
         description="Acompanhe todos os processos jurídicos e suas informações"

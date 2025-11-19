@@ -221,6 +221,41 @@ All colors MUST be HSL.
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
     font-size: 15px;
     line-height: 1.6;
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+  }
+  
+  html {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+  }
+  
+  #root {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+  
+  /* Garantir que todos os containers respeitem a largura */
+  .container,
+  [class*="container"] {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  
+  /* Prevenir overflow horizontal em todos os elementos */
+  * {
+    box-sizing: border-box;
+  }
+  
+  /* Garantir que imagens e vídeos não quebrem o layout */
+  img,
+  video,
+  iframe {
+    max-width: 100%;
+    height: auto;
   }
 }
 

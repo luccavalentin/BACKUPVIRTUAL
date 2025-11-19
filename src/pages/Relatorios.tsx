@@ -491,7 +491,7 @@ export default function Relatorios() {
   const saldo = (totalRevenue || 0) - (totalExpenses || 0);
 
   return (
-    <div>
+    <div className="w-full max-w-full overflow-x-hidden">
       <PageHeader 
         title="Relatórios" 
         description="Análises detalhadas e visões gerais do seu negócio"
@@ -594,10 +594,10 @@ export default function Relatorios() {
               Receitas vs Despesas
             </CardTitle>
           </CardHeader>
-          <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
-            <div className="flex flex-col items-center w-full">
-              <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 250 : 300}>
-                <AreaChart data={revenueVsExpenses || []} margin={{ top: 5, right: 10, left: 0, bottom: window.innerWidth < 640 ? 60 : 5 }}>
+          <CardContent className="px-3 sm:px-6 pb-4 sm:pb-6">
+            <div className="flex flex-col items-center w-full overflow-visible">
+              <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 280 : 320}>
+                <AreaChart data={revenueVsExpenses || []} margin={{ top: 5, right: 10, left: 0, bottom: window.innerWidth < 640 ? 80 : 60 }}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
                   <XAxis 
                     dataKey="month" 
@@ -642,25 +642,38 @@ export default function Relatorios() {
                     fillOpacity={0.6}
                     name="Despesas"
                   />
+                  <Legend 
+                    verticalAlign="bottom"
+                    height={window.innerWidth < 640 ? 50 : 40}
+                    wrapperStyle={{ 
+                      paddingTop: window.innerWidth < 640 ? '12px' : '8px',
+                      paddingBottom: window.innerWidth < 640 ? '8px' : '0px',
+                      fontSize: window.innerWidth < 640 ? '11px' : '13px',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      gap: window.innerWidth < 640 ? '16px' : '20px',
+                      flexWrap: 'wrap',
+                      width: '100%',
+                      maxWidth: '100%',
+                      overflow: 'visible'
+                    }}
+                    iconType="square"
+                    iconSize={window.innerWidth < 640 ? 10 : 12}
+                    formatter={(value) => (
+                      <span style={{ 
+                        fontSize: window.innerWidth < 640 ? '11px' : '13px',
+                        fontWeight: '500',
+                        color: 'hsl(var(--foreground))',
+                        whiteSpace: 'normal',
+                        wordBreak: 'break-word',
+                        lineHeight: '1.5'
+                      }}>
+                        {value}
+                      </span>
+                    )}
+                  />
                 </AreaChart>
               </ResponsiveContainer>
-              <Legend 
-                wrapperStyle={{ 
-                  paddingTop: '12px',
-                  fontSize: window.innerWidth < 640 ? '11px' : '13px'
-                }}
-                iconType="square"
-                iconSize={12}
-                formatter={(value) => (
-                  <span style={{ 
-                    fontSize: window.innerWidth < 640 ? '11px' : '13px',
-                    fontWeight: '500',
-                    color: 'hsl(var(--foreground))'
-                  }}>
-                    {value}
-                  </span>
-                )}
-              />
             </div>
           </CardContent>
         </Card>
@@ -673,9 +686,9 @@ export default function Relatorios() {
               <span className="text-sm sm:text-base md:text-lg">Saldo Mensal</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
-            <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 280 : 300}>
-              <LineChart data={revenueVsExpenses || []} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+          <CardContent className="px-3 sm:px-6 pb-4 sm:pb-6">
+            <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 300 : 320}>
+              <LineChart data={revenueVsExpenses || []} margin={{ top: 5, right: 10, left: 0, bottom: window.innerWidth < 640 ? 60 : 50 }}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
                 <XAxis 
                   dataKey="month" 
@@ -712,14 +725,28 @@ export default function Relatorios() {
                   name="Saldo Mensal"
                 />
                 <Legend 
-                  wrapperStyle={{ paddingTop: '12px' }}
+                  verticalAlign="bottom"
+                  height={window.innerWidth < 640 ? 40 : 30}
+                  wrapperStyle={{ 
+                    paddingTop: window.innerWidth < 640 ? '12px' : '8px',
+                    paddingBottom: window.innerWidth < 640 ? '8px' : '0px',
+                    fontSize: window.innerWidth < 640 ? '11px' : '12px',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    width: '100%',
+                    maxWidth: '100%',
+                    overflow: 'visible'
+                  }}
                   iconType="line"
-                  iconSize={12}
+                  iconSize={window.innerWidth < 640 ? 10 : 12}
                   formatter={(value) => (
                     <span style={{ 
                       fontSize: window.innerWidth < 640 ? '11px' : '12px', 
                       fontWeight: '500',
-                      color: 'hsl(var(--foreground))'
+                      color: 'hsl(var(--foreground))',
+                      whiteSpace: 'normal',
+                      wordBreak: 'break-word',
+                      lineHeight: '1.4'
                     }}>
                       {value}
                     </span>
@@ -740,13 +767,13 @@ export default function Relatorios() {
               <span className="text-sm sm:text-base md:text-lg">Receitas por Categoria</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
-            <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 280 : 300}>
-              <RechartsPieChart>
+          <CardContent className="px-3 sm:px-6 pb-4 sm:pb-6">
+            <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 320 : 340}>
+              <RechartsPieChart margin={{ top: 10, right: 10, bottom: window.innerWidth < 640 ? 90 : 100, left: 10 }}>
                 <Pie
                   data={revenueByCategory || []}
                   cx="50%"
-                  cy="50%"
+                  cy={window.innerWidth < 640 ? "45%" : "50%"}
                   labelLine={false}
                   label={false}
                   outerRadius={window.innerWidth < 640 ? 70 : window.innerWidth < 768 ? 85 : 100}
@@ -778,12 +805,16 @@ export default function Relatorios() {
                   height={window.innerWidth < 640 ? 80 : 100}
                   iconType="circle"
                   wrapperStyle={{
-                    paddingTop: window.innerWidth < 640 ? '8px' : '12px',
+                    paddingTop: window.innerWidth < 640 ? '12px' : '16px',
+                    paddingBottom: window.innerWidth < 640 ? '8px' : '0px',
                     fontSize: window.innerWidth < 640 ? '10px' : '12px',
                     display: 'flex',
                     flexWrap: 'wrap',
                     justifyContent: 'center',
-                    gap: window.innerWidth < 640 ? '8px' : '12px'
+                    gap: window.innerWidth < 640 ? '8px' : '12px',
+                    width: '100%',
+                    maxWidth: '100%',
+                    overflow: 'visible'
                   }}
                   formatter={(value, entry: any) => {
                     const data = entry.payload;
@@ -795,7 +826,11 @@ export default function Relatorios() {
                         fontWeight: '500',
                         display: 'inline-flex',
                         alignItems: 'center',
-                        gap: '4px'
+                        gap: '4px',
+                        whiteSpace: 'normal',
+                        wordBreak: 'break-word',
+                        lineHeight: '1.4',
+                        textAlign: 'center'
                       }}>
                         <span>{value}:</span>
                         <span style={{ fontWeight: '700' }}>{percent}%</span>
@@ -816,13 +851,13 @@ export default function Relatorios() {
               <span className="text-sm sm:text-base md:text-lg">Despesas por Categoria</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
-            <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 280 : 300}>
-              <RechartsPieChart>
+          <CardContent className="px-3 sm:px-6 pb-4 sm:pb-6">
+            <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 320 : 340}>
+              <RechartsPieChart margin={{ top: 10, right: 10, bottom: window.innerWidth < 640 ? 90 : 100, left: 10 }}>
                 <Pie
                   data={expensesByCategory || []}
                   cx="50%"
-                  cy="50%"
+                  cy={window.innerWidth < 640 ? "45%" : "50%"}
                   labelLine={false}
                   label={false}
                   outerRadius={window.innerWidth < 640 ? 70 : window.innerWidth < 768 ? 85 : 100}
@@ -854,12 +889,16 @@ export default function Relatorios() {
                   height={window.innerWidth < 640 ? 80 : 100}
                   iconType="circle"
                   wrapperStyle={{
-                    paddingTop: window.innerWidth < 640 ? '8px' : '12px',
+                    paddingTop: window.innerWidth < 640 ? '12px' : '16px',
+                    paddingBottom: window.innerWidth < 640 ? '8px' : '0px',
                     fontSize: window.innerWidth < 640 ? '10px' : '12px',
                     display: 'flex',
                     flexWrap: 'wrap',
                     justifyContent: 'center',
-                    gap: window.innerWidth < 640 ? '8px' : '12px'
+                    gap: window.innerWidth < 640 ? '8px' : '12px',
+                    width: '100%',
+                    maxWidth: '100%',
+                    overflow: 'visible'
                   }}
                   formatter={(value, entry: any) => {
                     const data = entry.payload;
@@ -871,7 +910,11 @@ export default function Relatorios() {
                         fontWeight: '500',
                         display: 'inline-flex',
                         alignItems: 'center',
-                        gap: '4px'
+                        gap: '4px',
+                        whiteSpace: 'normal',
+                        wordBreak: 'break-word',
+                        lineHeight: '1.4',
+                        textAlign: 'center'
                       }}>
                         <span>{value}:</span>
                         <span style={{ fontWeight: '700' }}>{percent}%</span>

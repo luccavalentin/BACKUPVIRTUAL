@@ -475,7 +475,7 @@ export default function Emprestimos() {
   };
 
   return (
-    <div>
+    <div className="w-full max-w-full overflow-x-hidden">
       <PageHeader
         title="Empréstimos"
         description="Gerencie empréstimos e recebíveis"

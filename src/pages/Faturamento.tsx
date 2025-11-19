@@ -338,7 +338,7 @@ export default function Faturamento() {
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6 md:space-y-8 w-full px-0.25 sm:px-0.5 md:px-0.75">
+    <div className="space-y-4 sm:space-y-6 md:space-y-8 w-full max-w-full overflow-x-hidden px-0.25 sm:px-0.5 md:px-0.75">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <PageHeader
           title="Faturamento"

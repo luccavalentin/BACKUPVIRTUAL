@@ -550,7 +550,7 @@ export default function Receitas() {
   };
 
   return (
-    <div>
+    <div className="w-full max-w-full overflow-x-hidden">
       <PageHeader
         title="Receitas"
         description="Gerencie todas as receitas do negócio"

@@ -34,12 +34,12 @@ export const QuickActions = () => {
   ];
 
   return (
-    <Card className="mb-4 sm:mb-6 shadow-sm rounded-lg border border-border/40 bg-card">
-      <CardHeader className="pb-2 sm:pb-3 px-3 sm:px-6 pt-3 sm:pt-6">
+    <Card className="mb-3 sm:mb-4 md:mb-6 shadow-sm rounded-lg border border-border/40 bg-card w-full max-w-full">
+      <CardHeader className="pb-2 sm:pb-3 px-3 sm:px-4 md:px-6 pt-3 sm:pt-4 md:pt-6">
         <CardTitle className="text-sm sm:text-base font-semibold tracking-tight text-foreground">Ações Rápidas</CardTitle>
       </CardHeader>
-      <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+      <CardContent className="px-3 sm:px-4 md:px-6 pb-3 sm:pb-4 md:pb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 w-full">
           {actions.map((action) => {
             const Icon = action.icon;
             return (
@@ -61,7 +61,7 @@ export const QuickActions = () => {
                 <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-md bg-background/90 shadow-sm">
                   <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-foreground" />
                 </div>
-                <span className="text-[10px] sm:text-xs font-medium text-foreground text-center leading-tight px-1">{action.label}</span>
+                <span className="text-[10px] sm:text-xs font-medium text-foreground text-center leading-tight px-1 break-words">{action.label}</span>
               </Button>
             );
           })}

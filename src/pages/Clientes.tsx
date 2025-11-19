@@ -452,7 +452,7 @@ const handleEdit = (client: any) => {
   };
 
   return (
-    <div>
+    <div className="w-full max-w-full overflow-x-hidden">
       <PageHeader
         title="Clientes"
         description="Gerencie todos os clientes e fornecedores do sistema"

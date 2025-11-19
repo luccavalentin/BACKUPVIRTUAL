@@ -375,7 +375,7 @@ export default function Gado() {
   };
 
   return (
-    <div>
+    <div className="w-full max-w-full overflow-x-hidden">
       <PageHeader
         title="Gado"
         description="Gerencie todo o rebanho"

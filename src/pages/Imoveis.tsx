@@ -671,7 +671,7 @@ export default function Imoveis() {
   };
 
   return (
-    <div>
+    <div className="w-full max-w-full overflow-x-hidden">
       <PageHeader
         title="Imóveis"
         description="Gerencie todos os imóveis e propriedades"
@@ -684,7 +684,7 @@ export default function Imoveis() {
       <QuickActions />
 
       {/* Cards de Estatísticas */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6 w-full">
         <StatsCard
           title="Total de Imóveis"
           value={stats.total}
@@ -728,19 +728,19 @@ export default function Imoveis() {
       </div>
 
       {/* Filtros e Busca */}
-      <Card className="mb-4 border-2 border-border/50 rounded-2xl shadow-elegant-lg">
-        <CardContent className="p-4">
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-            <div className="flex-1 w-full">
+      <Card className="mb-4 border-2 border-border/50 rounded-2xl shadow-elegant-lg w-full max-w-full">
+        <CardContent className="p-3 sm:p-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-start sm:items-center w-full">
+            <div className="flex-1 w-full min-w-0">
         <SmartSearchInput
           value={searchTerm}
           onChange={setSearchTerm}
                 placeholder="Buscar por endereço, cidade, CEP, número, inscrição municipal..."
         />
           </div>
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex gap-2 flex-wrap w-full sm:w-auto">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[140px]">
+                <SelectTrigger className="w-full sm:w-[140px]">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -750,7 +750,7 @@ export default function Imoveis() {
                 </SelectContent>
               </Select>
               <Select value={cityFilter} onValueChange={setCityFilter}>
-                <SelectTrigger className="w-[160px]">
+                <SelectTrigger className="w-full sm:w-[160px]">
                   <SelectValue placeholder="Cidade" />
                 </SelectTrigger>
                 <SelectContent>
@@ -762,12 +762,12 @@ export default function Imoveis() {
                   ))}
                 </SelectContent>
               </Select>
-              <Button onClick={handleExportPDF} className="gap-2 shadow-elegant hover:shadow-elegant-lg">
+              <Button onClick={handleExportPDF} className="gap-2 shadow-elegant hover:shadow-elegant-lg w-full sm:w-auto">
                 <FileText className="w-4 h-4" />
                 <span className="hidden sm:inline">Exportar PDF</span>
                 <span className="sm:hidden">PDF</span>
               </Button>
-              <Button onClick={handleExportExcel} variant="outline" className="gap-2 shadow-sm hover:shadow-elegant">
+              <Button onClick={handleExportExcel} variant="outline" className="gap-2 shadow-sm hover:shadow-elegant w-full sm:w-auto">
                 <Download className="w-4 h-4" />
                 <span className="hidden sm:inline">Exportar Excel</span>
                 <span className="sm:hidden">Excel</span>
@@ -782,8 +782,8 @@ export default function Imoveis() {
         </CardContent>
       </Card>
 
-      <div className="bg-card rounded-2xl shadow-elegant-lg border border-border/50 overflow-x-auto">
-        <Table className="w-full border-separate border-spacing-0 min-w-[1200px]">
+      <div className="bg-card rounded-2xl shadow-elegant-lg border border-border/50 overflow-x-auto w-full">
+        <Table className="w-full border-separate border-spacing-0 min-w-[800px] sm:min-w-[1000px] md:min-w-[1200px]">
           <TableHeader>
             <TableRow className="border-b-2 border-primary/30 hover:bg-transparent">
               <TableHead className="bg-gradient-to-r from-primary/10 to-primary/5 backdrop-blur-sm font-bold border-r border-border/50 rounded-tl-xl px-1.5 sm:px-2 text-xs text-center">

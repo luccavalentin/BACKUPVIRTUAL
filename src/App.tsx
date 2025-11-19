@@ -51,10 +51,11 @@ const App = () => (
               path="/*"
               element={
                 <ProtectedRoute>
-                  <div className="flex min-h-screen bg-background">
+                  <div className="flex min-h-screen bg-background overflow-x-hidden w-full max-w-full">
                     <AppSidebar />
-                    <main className="flex-1 md:ml-64 p-4 md:p-8 w-full">
-                      <Routes>
+                    <main className="flex-1 md:ml-64 p-2 sm:p-3 md:p-4 lg:p-6 xl:p-8 w-full max-w-full overflow-x-hidden">
+                      <div className="w-full max-w-full overflow-x-hidden">
+                        <Routes>
                         <Route path="/" element={<Dashboard />} />
                         <Route path="/receitas" element={<Receitas />} />
                         <Route path="/despesas" element={<Despesas />} />
@@ -72,7 +73,8 @@ const App = () => (
                         <Route path="/dashboards-financeiros" element={<Relatorios />} />
                         <Route path="/importar-dados" element={<ImportData />} />
                         <Route path="*" element={<NotFound />} />
-                      </Routes>
+                        </Routes>
+                      </div>
                     </main>
                   </div>
                 </ProtectedRoute>
