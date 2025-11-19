@@ -768,16 +768,16 @@ export default function Relatorios() {
             </CardTitle>
           </CardHeader>
           <CardContent className="px-3 sm:px-6 pb-4 sm:pb-6">
-            <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 320 : 340}>
-              <RechartsPieChart margin={{ top: 10, right: 10, bottom: window.innerWidth < 640 ? 90 : 100, left: 10 }}>
+            <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 350 : 400}>
+              <RechartsPieChart margin={{ top: 10, right: 10, bottom: window.innerWidth < 640 ? 100 : 120, left: 10 }}>
                 <Pie
                   data={revenueByCategory || []}
                   cx="50%"
-                  cy={window.innerWidth < 640 ? "45%" : "50%"}
+                  cy={window.innerWidth < 640 ? "42%" : "45%"}
                   labelLine={false}
                   label={false}
-                  outerRadius={window.innerWidth < 640 ? 70 : window.innerWidth < 768 ? 85 : 100}
-                  innerRadius={window.innerWidth < 640 ? 20 : 30}
+                  outerRadius={window.innerWidth < 640 ? 75 : window.innerWidth < 768 ? 90 : 110}
+                  innerRadius={window.innerWidth < 640 ? 25 : 35}
                   fill="#8884d8"
                   dataKey="amount"
                   paddingAngle={2}
@@ -802,38 +802,41 @@ export default function Relatorios() {
                 />
                 <Legend 
                   verticalAlign="bottom"
-                  height={window.innerWidth < 640 ? 80 : 100}
+                  height={window.innerWidth < 640 ? 90 : 110}
                   iconType="circle"
                   wrapperStyle={{
-                    paddingTop: window.innerWidth < 640 ? '12px' : '16px',
-                    paddingBottom: window.innerWidth < 640 ? '8px' : '0px',
-                    fontSize: window.innerWidth < 640 ? '10px' : '12px',
+                    paddingTop: window.innerWidth < 640 ? '20px' : '24px',
+                    paddingBottom: window.innerWidth < 640 ? '12px' : '8px',
+                    fontSize: window.innerWidth < 640 ? '11px' : '13px',
+                    fontWeight: '600',
                     display: 'flex',
                     flexWrap: 'wrap',
                     justifyContent: 'center',
-                    gap: window.innerWidth < 640 ? '8px' : '12px',
+                    gap: window.innerWidth < 640 ? '10px' : '14px',
                     width: '100%',
                     maxWidth: '100%',
                     overflow: 'visible'
                   }}
                   formatter={(value, entry: any) => {
                     const data = entry.payload;
-                    const percent = data && revenueByCategory ? 
-                      ((data.amount / revenueByCategory.reduce((sum: number, item: any) => sum + item.amount, 0)) * 100).toFixed(1) : '0';
+                    const total = revenueByCategory ? revenueByCategory.reduce((sum: number, item: any) => sum + item.amount, 0) : 0;
+                    const percent = data && total > 0 ? ((data.amount / total) * 100).toFixed(1) : '0';
+                    const formattedValue = formatCurrency(data.amount || 0);
                     return (
                       <span style={{
-                        fontSize: window.innerWidth < 640 ? '10px' : '12px',
-                        fontWeight: '500',
+                        fontSize: window.innerWidth < 640 ? '11px' : '13px',
+                        fontWeight: '600',
                         display: 'inline-flex',
                         alignItems: 'center',
-                        gap: '4px',
+                        gap: '6px',
                         whiteSpace: 'normal',
                         wordBreak: 'break-word',
-                        lineHeight: '1.4',
+                        lineHeight: '1.5',
                         textAlign: 'center'
                       }}>
                         <span>{value}:</span>
-                        <span style={{ fontWeight: '700' }}>{percent}%</span>
+                        <span style={{ fontWeight: '700' }}>{formattedValue}</span>
+                        <span style={{ fontWeight: '700', color: 'hsl(var(--muted-foreground))' }}>({percent}%)</span>
                       </span>
                     );
                   }}
@@ -852,16 +855,16 @@ export default function Relatorios() {
             </CardTitle>
           </CardHeader>
           <CardContent className="px-3 sm:px-6 pb-4 sm:pb-6">
-            <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 320 : 340}>
-              <RechartsPieChart margin={{ top: 10, right: 10, bottom: window.innerWidth < 640 ? 90 : 100, left: 10 }}>
+            <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 350 : 400}>
+              <RechartsPieChart margin={{ top: 10, right: 10, bottom: window.innerWidth < 640 ? 100 : 120, left: 10 }}>
                 <Pie
                   data={expensesByCategory || []}
                   cx="50%"
-                  cy={window.innerWidth < 640 ? "45%" : "50%"}
+                  cy={window.innerWidth < 640 ? "42%" : "45%"}
                   labelLine={false}
                   label={false}
-                  outerRadius={window.innerWidth < 640 ? 70 : window.innerWidth < 768 ? 85 : 100}
-                  innerRadius={window.innerWidth < 640 ? 20 : 30}
+                  outerRadius={window.innerWidth < 640 ? 75 : window.innerWidth < 768 ? 90 : 110}
+                  innerRadius={window.innerWidth < 640 ? 25 : 35}
                   fill="#8884d8"
                   dataKey="amount"
                   paddingAngle={2}
@@ -886,38 +889,41 @@ export default function Relatorios() {
                 />
                 <Legend 
                   verticalAlign="bottom"
-                  height={window.innerWidth < 640 ? 80 : 100}
+                  height={window.innerWidth < 640 ? 90 : 110}
                   iconType="circle"
                   wrapperStyle={{
-                    paddingTop: window.innerWidth < 640 ? '12px' : '16px',
-                    paddingBottom: window.innerWidth < 640 ? '8px' : '0px',
-                    fontSize: window.innerWidth < 640 ? '10px' : '12px',
+                    paddingTop: window.innerWidth < 640 ? '20px' : '24px',
+                    paddingBottom: window.innerWidth < 640 ? '12px' : '8px',
+                    fontSize: window.innerWidth < 640 ? '11px' : '13px',
+                    fontWeight: '600',
                     display: 'flex',
                     flexWrap: 'wrap',
                     justifyContent: 'center',
-                    gap: window.innerWidth < 640 ? '8px' : '12px',
+                    gap: window.innerWidth < 640 ? '10px' : '14px',
                     width: '100%',
                     maxWidth: '100%',
                     overflow: 'visible'
                   }}
                   formatter={(value, entry: any) => {
                     const data = entry.payload;
-                    const percent = data && expensesByCategory ? 
-                      ((data.amount / expensesByCategory.reduce((sum: number, item: any) => sum + item.amount, 0)) * 100).toFixed(1) : '0';
+                    const total = expensesByCategory ? expensesByCategory.reduce((sum: number, item: any) => sum + item.amount, 0) : 0;
+                    const percent = data && total > 0 ? ((data.amount / total) * 100).toFixed(1) : '0';
+                    const formattedValue = formatCurrency(data.amount || 0);
                     return (
                       <span style={{
-                        fontSize: window.innerWidth < 640 ? '10px' : '12px',
-                        fontWeight: '500',
+                        fontSize: window.innerWidth < 640 ? '11px' : '13px',
+                        fontWeight: '600',
                         display: 'inline-flex',
                         alignItems: 'center',
-                        gap: '4px',
+                        gap: '6px',
                         whiteSpace: 'normal',
                         wordBreak: 'break-word',
-                        lineHeight: '1.4',
+                        lineHeight: '1.5',
                         textAlign: 'center'
                       }}>
                         <span>{value}:</span>
-                        <span style={{ fontWeight: '700' }}>{percent}%</span>
+                        <span style={{ fontWeight: '700' }}>{formattedValue}</span>
+                        <span style={{ fontWeight: '700', color: 'hsl(var(--muted-foreground))' }}>({percent}%)</span>
                       </span>
                     );
                   }}
@@ -1138,18 +1144,26 @@ export default function Relatorios() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Endereço</TableHead>
-                    <TableHead>Tipo</TableHead>
-                    <TableHead>Valor</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead>Cidade</TableHead>
+                    <TableHead>Valor Venal</TableHead>
+                    <TableHead>Status Documentação</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {propertiesDetails.map((property: any) => (
                     <TableRow key={property.id}>
-                      <TableCell>{property.address || "-"}</TableCell>
-                      <TableCell>{property.type || "-"}</TableCell>
-                      <TableCell>{property.value ? formatCurrency(Number(property.value)) : "-"}</TableCell>
-                      <TableCell>{property.status || "-"}</TableCell>
+                      <TableCell>{property.address || "-"}{property.number ? `, ${property.number}` : ""}{property.complement ? ` - ${property.complement}` : ""}</TableCell>
+                      <TableCell>{property.city || "-"}</TableCell>
+                      <TableCell className="font-semibold text-success">{property.venal_value ? formatCurrency(Number(property.venal_value)) : "-"}</TableCell>
+                      <TableCell>
+                        {property.documentation_status === "PAGO" ? (
+                          <span className="text-success font-semibold">PAGO</span>
+                        ) : property.documentation_status === "PENDENTE" ? (
+                          <span className="text-destructive font-semibold">PENDENTE</span>
+                        ) : (
+                          property.documentation_status || "-"
+                        )}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

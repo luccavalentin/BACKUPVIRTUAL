@@ -529,7 +529,7 @@ export default function Faturamento() {
                           )}
                         </TableCell>
                       ))}
-                      <TableCell className="text-center font-bold text-success bg-primary/5 border-l-2 border-primary/30 sticky right-0 z-10 text-xs sm:text-sm px-2 sm:px-4" style={{ right: 0 }}>
+                      <TableCell className="text-center font-bold text-success bg-primary border-l-2 border-primary/30 sticky right-0 z-10 text-xs sm:text-sm px-2 sm:px-4 text-primary-foreground" style={{ right: 0 }}>
                         <span className="whitespace-nowrap">{formatCurrency(item.total)}</span>
                       </TableCell>
                     </TableRow>
@@ -546,7 +546,7 @@ export default function Faturamento() {
                         <span className="whitespace-nowrap">{formatCurrency(monthlyTotals[month.key] || 0)}</span>
                       </TableCell>
                     ))}
-                    <TableCell className="text-center font-bold text-success bg-primary/20 border-l-2 border-primary/50 sticky right-0 z-10 text-xs sm:text-sm px-2 sm:px-4 rounded-br-xl" style={{ right: 0 }}>
+                    <TableCell className="text-center font-bold text-primary-foreground bg-primary border-l-2 border-primary/50 sticky right-0 z-10 text-xs sm:text-sm px-2 sm:px-4 rounded-br-xl" style={{ right: 0 }}>
                       <span className="whitespace-nowrap">{formatCurrency(grandTotal)}</span>
                     </TableCell>
                   </TableRow>

@@ -2809,24 +2809,21 @@ export default function Dashboard() {
             <CardHeader className="pb-4">
               <CardTitle className="text-xl font-bold tracking-tight">Receitas vs Despesas - Período 1</CardTitle>
           </CardHeader>
-            <CardContent className="overflow-visible">
+            <CardContent className="overflow-visible pb-4 sm:pb-6">
               <div ref={comparisonPieChartRef1} className="w-full overflow-visible">
-                <ResponsiveContainer width="100%" height={getChartHeight()} className={getChartMinHeight()}>
-                <PieChart>
+                <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 300 : window.innerWidth < 768 ? 350 : 400} className="min-h-[300px] sm:min-h-[350px] md:min-h-[400px]">
+                <PieChart margin={{ top: 10, right: 10, bottom: window.innerWidth < 640 ? 80 : 70, left: 10 }}>
                   <Pie
                 data={[
                       { name: "Receitas", value: comparisonRevenue1 || 0 },
                       { name: "Despesas", value: comparisonExpense1 || 0 },
                     ]}
                     cx="50%"
-                    cy="50%"
+                    cy={window.innerWidth < 640 ? "42%" : "45%"}
                     labelLine={false}
-                    label={({ name, percent, value }) => {
-                      if (value === 0) return '';
-                      return `${name}\n${(percent * 100).toFixed(1)}%\n${formatCurrency(value)}`;
-                    }}
-                    outerRadius={100}
-                    innerRadius={40}
+                    label={false}
+                    outerRadius={window.innerWidth < 640 ? 75 : window.innerWidth < 768 ? 90 : 110}
+                    innerRadius={window.innerWidth < 640 ? 35 : 45}
                     fill="#8884d8"
                     dataKey="value"
                     paddingAngle={3}
@@ -2842,7 +2839,8 @@ export default function Dashboard() {
                       border: '1px solid hsl(var(--border))',
                       borderRadius: '0.75rem',
                       padding: '12px',
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                      fontSize: window.innerWidth < 640 ? '11px' : '13px'
                     }}
                     formatter={(value: number, name: string) => [
                       formatCurrency(value),
@@ -2850,27 +2848,48 @@ export default function Dashboard() {
                     ]}
                     labelStyle={{ 
                       fontWeight: 'bold',
-                      fontSize: '14px',
+                      fontSize: window.innerWidth < 640 ? '12px' : '14px',
                       marginBottom: '4px'
                     }}
                   />
                   <Legend 
                     verticalAlign="bottom" 
-                    height={36}
+                    height={window.innerWidth < 640 ? 70 : 60}
                     iconType="circle"
                     wrapperStyle={{ 
-                      paddingTop: '20px',
-                      fontSize: '14px',
-                      fontWeight: '500'
+                      paddingTop: window.innerWidth < 640 ? '20px' : '24px',
+                      paddingBottom: window.innerWidth < 640 ? '12px' : '8px',
+                      fontSize: window.innerWidth < 640 ? '12px' : '14px',
+                      fontWeight: '600',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      gap: window.innerWidth < 640 ? '16px' : '20px',
+                      flexWrap: 'wrap',
+                      width: '100%',
+                      maxWidth: '100%',
+                      overflow: 'visible'
                     }}
-                    formatter={(value) => (
-                      <span style={{ 
-                        color: value === 'Receitas' ? 'hsl(var(--success))' : 'hsl(var(--destructive))',
-                        fontWeight: '600'
-                      }}>
-                        {value}
-                      </span>
-                    )}
+                    formatter={(value, entry: any) => {
+                      const data = entry.payload;
+                      const formattedValue = formatCurrency(data.value || 0);
+                      return (
+                        <span style={{ 
+                          color: value === 'Receitas' ? 'hsl(var(--success))' : 'hsl(var(--destructive))',
+                          fontWeight: '700',
+                          fontSize: window.innerWidth < 640 ? '12px' : '14px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          whiteSpace: 'normal',
+                          wordBreak: 'break-word',
+                          lineHeight: '1.6',
+                          textAlign: 'center'
+                        }}>
+                          <span>{value}:</span>
+                          <span style={{ fontWeight: '800' }}>{formattedValue}</span>
+                        </span>
+                      );
+                    }}
                   />
                 </PieChart>
             </ResponsiveContainer>
@@ -2906,17 +2925,18 @@ export default function Dashboard() {
                     paddingAngle={3}
                     stroke="hsl(var(--background))"
                     strokeWidth={2}
-                >
-                  <Cell fill="hsl(var(--success))" />
+                  >
+                    <Cell fill="hsl(var(--success))" />
                     <Cell fill="hsl(var(--destructive))" />
-                </Pie>
-                  <Tooltip 
+                  </Pie>
+                <Tooltip 
                     contentStyle={{ 
                       backgroundColor: 'hsl(var(--popover))', 
                       border: '1px solid hsl(var(--border))',
                       borderRadius: '0.75rem',
                       padding: '12px',
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                      fontSize: window.innerWidth < 640 ? '11px' : '13px'
                     }}
                     formatter={(value: number, name: string) => [
                       formatCurrency(value),
@@ -2924,27 +2944,48 @@ export default function Dashboard() {
                     ]}
                     labelStyle={{ 
                       fontWeight: 'bold',
-                      fontSize: '14px',
+                      fontSize: window.innerWidth < 640 ? '12px' : '14px',
                       marginBottom: '4px'
                     }}
                   />
                   <Legend 
                     verticalAlign="bottom" 
-                    height={36}
+                    height={window.innerWidth < 640 ? 70 : 60}
                     iconType="circle"
                     wrapperStyle={{ 
-                      paddingTop: '20px',
-                      fontSize: '14px',
-                      fontWeight: '500'
+                      paddingTop: window.innerWidth < 640 ? '20px' : '24px',
+                      paddingBottom: window.innerWidth < 640 ? '12px' : '8px',
+                      fontSize: window.innerWidth < 640 ? '12px' : '14px',
+                      fontWeight: '600',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      gap: window.innerWidth < 640 ? '16px' : '20px',
+                      flexWrap: 'wrap',
+                      width: '100%',
+                      maxWidth: '100%',
+                      overflow: 'visible'
                     }}
-                    formatter={(value) => (
-                      <span style={{ 
-                        color: value === 'Receitas' ? 'hsl(var(--success))' : 'hsl(var(--destructive))',
-                        fontWeight: '600'
-                      }}>
-                        {value}
-                      </span>
-                    )}
+                    formatter={(value, entry: any) => {
+                      const data = entry.payload;
+                      const formattedValue = formatCurrency(data.value || 0);
+                      return (
+                        <span style={{ 
+                          color: value === 'Receitas' ? 'hsl(var(--success))' : 'hsl(var(--destructive))',
+                          fontWeight: '700',
+                          fontSize: window.innerWidth < 640 ? '12px' : '14px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          whiteSpace: 'normal',
+                          wordBreak: 'break-word',
+                          lineHeight: '1.6',
+                          textAlign: 'center'
+                        }}>
+                          <span>{value}:</span>
+                          <span style={{ fontWeight: '800' }}>{formattedValue}</span>
+                        </span>
+                      );
+                    }}
                   />
               </PieChart>
             </ResponsiveContainer>
@@ -2960,19 +3001,19 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent className="overflow-visible pb-4 sm:pb-6">
               <div ref={pieChartRef} className="w-full overflow-x-auto overflow-y-visible break-words sm:overflow-visible">
-                <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 280 : window.innerWidth < 768 ? 320 : 380} className="min-h-[280px] sm:min-h-[320px] md:min-h-[380px]">
-                <PieChart margin={{ top: 10, right: 10, bottom: window.innerWidth < 640 ? 70 : 50, left: 10 }}>
+                <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 300 : window.innerWidth < 768 ? 350 : 400} className="min-h-[300px] sm:min-h-[350px] md:min-h-[400px]">
+                <PieChart margin={{ top: 10, right: 10, bottom: window.innerWidth < 640 ? 80 : 70, left: 10 }}>
                   <Pie
                     data={[
                       { name: "Receitas", value: revenueData || 0 },
                       { name: "Despesas", value: expensesData || 0 },
                     ]}
                     cx="50%"
-                    cy={window.innerWidth < 640 ? "45%" : "50%"}
+                    cy={window.innerWidth < 640 ? "42%" : "45%"}
                     labelLine={false}
                     label={false}
-                    outerRadius={window.innerWidth < 640 ? 70 : window.innerWidth < 768 ? 85 : 100}
-                    innerRadius={window.innerWidth < 640 ? 30 : 40}
+                    outerRadius={window.innerWidth < 640 ? 75 : window.innerWidth < 768 ? 90 : 110}
+                    innerRadius={window.innerWidth < 640 ? 35 : 45}
                     fill="#8884d8"
                     dataKey="value"
                     paddingAngle={3}
@@ -3003,16 +3044,16 @@ export default function Dashboard() {
                   />
                   <Legend 
                     verticalAlign="bottom"
-                    height={window.innerWidth < 640 ? 60 : 50}
+                    height={window.innerWidth < 640 ? 70 : 60}
                     iconType="circle"
                     wrapperStyle={{
-                      paddingTop: window.innerWidth < 640 ? '16px' : '20px',
-                      paddingBottom: window.innerWidth < 640 ? '8px' : '0px',
-                      fontSize: window.innerWidth < 640 ? '11px' : '13px',
-                      fontWeight: '500',
+                      paddingTop: window.innerWidth < 640 ? '20px' : '24px',
+                      paddingBottom: window.innerWidth < 640 ? '12px' : '8px',
+                      fontSize: window.innerWidth < 640 ? '12px' : '14px',
+                      fontWeight: '600',
                       display: 'flex',
                       justifyContent: 'center',
-                      gap: window.innerWidth < 640 ? '12px' : '16px',
+                      gap: window.innerWidth < 640 ? '16px' : '20px',
                       flexWrap: 'wrap',
                       width: '100%',
                       maxWidth: '100%',
@@ -3024,18 +3065,18 @@ export default function Dashboard() {
                       return (
                         <span style={{
                           color: value === 'Receitas' ? 'hsl(var(--success))' : 'hsl(var(--destructive))',
-                          fontWeight: '600',
-                          fontSize: window.innerWidth < 640 ? '11px' : '13px',
+                          fontWeight: '700',
+                          fontSize: window.innerWidth < 640 ? '12px' : '14px',
                           display: 'inline-flex',
                           alignItems: 'center',
-                          gap: '6px',
+                          gap: '8px',
                           whiteSpace: 'normal',
                           wordBreak: 'break-word',
-                          lineHeight: '1.5',
+                          lineHeight: '1.6',
                           textAlign: 'center'
                         }}>
                           <span>{value}:</span>
-                          <span style={{ fontWeight: '700' }}>{formattedValue}</span>
+                          <span style={{ fontWeight: '800' }}>{formattedValue}</span>
                         </span>
                       );
                     }}
@@ -3247,18 +3288,18 @@ export default function Dashboard() {
                   <span className="text-sm sm:text-base md:text-lg">Despesas por Categoria - Período 1</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="overflow-visible px-3 sm:px-6 pb-3 sm:pb-6">
+              <CardContent className="overflow-visible px-3 sm:px-6 pb-4 sm:pb-6">
                 <div ref={comparisonExpenseCategoryChartRef1} className="w-full overflow-visible">
-                  <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 280 : window.innerWidth < 768 ? 320 : getChartHeight()} className={getChartMinHeight()}>
-                    <PieChart>
+                  <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 350 : window.innerWidth < 768 ? 400 : getChartHeight()} className={getChartMinHeight()}>
+                    <PieChart margin={{ top: 10, right: 10, bottom: window.innerWidth < 640 ? 100 : 120, left: 10 }}>
                     <Pie
                       data={comparisonExpensesByCategory1 || []}
                       cx="50%"
-                      cy="50%"
+                      cy={window.innerWidth < 640 ? "42%" : "45%"}
                       labelLine={false}
                       label={false}
-                      outerRadius={window.innerWidth < 640 ? 70 : window.innerWidth < 768 ? 85 : 100}
-                      innerRadius={window.innerWidth < 640 ? 20 : 30}
+                      outerRadius={window.innerWidth < 640 ? 75 : window.innerWidth < 768 ? 90 : 110}
+                      innerRadius={window.innerWidth < 640 ? 25 : 35}
                       fill="#8884d8"
                       dataKey="amount"
                       paddingAngle={2}
@@ -3283,30 +3324,41 @@ export default function Dashboard() {
                     />
                     <Legend 
                       verticalAlign="bottom"
-                      height={window.innerWidth < 640 ? 80 : 100}
+                      height={window.innerWidth < 640 ? 90 : 110}
                       iconType="circle"
                       wrapperStyle={{
-                        paddingTop: window.innerWidth < 640 ? '8px' : '12px',
-                        fontSize: window.innerWidth < 640 ? '10px' : '12px',
+                        paddingTop: window.innerWidth < 640 ? '20px' : '24px',
+                        paddingBottom: window.innerWidth < 640 ? '12px' : '8px',
+                        fontSize: window.innerWidth < 640 ? '11px' : '13px',
+                        fontWeight: '600',
                         display: 'flex',
                         flexWrap: 'wrap',
                         justifyContent: 'center',
-                        gap: window.innerWidth < 640 ? '8px' : '12px'
+                        gap: window.innerWidth < 640 ? '10px' : '14px',
+                        width: '100%',
+                        maxWidth: '100%',
+                        overflow: 'visible'
                       }}
                       formatter={(value, entry: any) => {
                         const data = entry.payload;
-                        const percent = data && comparisonExpensesByCategory1 ? 
-                          ((data.amount / comparisonExpensesByCategory1.reduce((sum: number, item: any) => sum + item.amount, 0)) * 100).toFixed(1) : '0';
+                        const total = comparisonExpensesByCategory1 ? comparisonExpensesByCategory1.reduce((sum: number, item: any) => sum + item.amount, 0) : 0;
+                        const percent = data && total > 0 ? ((data.amount / total) * 100).toFixed(1) : '0';
+                        const formattedValue = formatCurrency(data.amount || 0);
                         return (
                           <span style={{
-                            fontSize: window.innerWidth < 640 ? '10px' : '12px',
-                            fontWeight: '500',
+                            fontSize: window.innerWidth < 640 ? '11px' : '13px',
+                            fontWeight: '600',
                             display: 'inline-flex',
                             alignItems: 'center',
-                            gap: '4px'
+                            gap: '6px',
+                            whiteSpace: 'normal',
+                            wordBreak: 'break-word',
+                            lineHeight: '1.5',
+                            textAlign: 'center'
                           }}>
                             <span>{value}:</span>
-                            <span style={{ fontWeight: '700' }}>{percent}%</span>
+                            <span style={{ fontWeight: '700' }}>{formattedValue}</span>
+                            <span style={{ fontWeight: '700', color: 'hsl(var(--muted-foreground))' }}>({percent}%)</span>
                           </span>
                         );
                       }}
@@ -3327,18 +3379,18 @@ export default function Dashboard() {
                   <span className="text-sm sm:text-base md:text-lg">Receitas por Categoria - Período 2</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="overflow-visible px-3 sm:px-6 pb-3 sm:pb-6">
+              <CardContent className="overflow-visible px-3 sm:px-6 pb-4 sm:pb-6">
                 <div ref={comparisonRevenueCategoryChartRef2} className="w-full overflow-visible">
-                  <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 280 : window.innerWidth < 768 ? 320 : getChartHeight()} className={getChartMinHeight()}>
-                    <PieChart>
+                  <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 350 : window.innerWidth < 768 ? 400 : getChartHeight()} className={getChartMinHeight()}>
+                    <PieChart margin={{ top: 10, right: 10, bottom: window.innerWidth < 640 ? 100 : 120, left: 10 }}>
                     <Pie
                       data={comparisonRevenueByCategory2 || []}
                       cx="50%"
-                      cy="50%"
+                      cy={window.innerWidth < 640 ? "42%" : "45%"}
                       labelLine={false}
                       label={false}
-                      outerRadius={window.innerWidth < 640 ? 70 : window.innerWidth < 768 ? 85 : 100}
-                      innerRadius={window.innerWidth < 640 ? 20 : 30}
+                      outerRadius={window.innerWidth < 640 ? 75 : window.innerWidth < 768 ? 90 : 110}
+                      innerRadius={window.innerWidth < 640 ? 25 : 35}
                       fill="#8884d8"
                       dataKey="amount"
                       paddingAngle={2}
@@ -3363,30 +3415,41 @@ export default function Dashboard() {
                     />
                     <Legend 
                       verticalAlign="bottom"
-                      height={window.innerWidth < 640 ? 80 : 100}
+                      height={window.innerWidth < 640 ? 90 : 110}
                       iconType="circle"
                       wrapperStyle={{
-                        paddingTop: window.innerWidth < 640 ? '8px' : '12px',
-                        fontSize: window.innerWidth < 640 ? '10px' : '12px',
+                        paddingTop: window.innerWidth < 640 ? '20px' : '24px',
+                        paddingBottom: window.innerWidth < 640 ? '12px' : '8px',
+                        fontSize: window.innerWidth < 640 ? '11px' : '13px',
+                        fontWeight: '600',
                         display: 'flex',
                         flexWrap: 'wrap',
                         justifyContent: 'center',
-                        gap: window.innerWidth < 640 ? '8px' : '12px'
+                        gap: window.innerWidth < 640 ? '10px' : '14px',
+                        width: '100%',
+                        maxWidth: '100%',
+                        overflow: 'visible'
                       }}
                       formatter={(value, entry: any) => {
                         const data = entry.payload;
-                        const percent = data && comparisonRevenueByCategory2 ? 
-                          ((data.amount / comparisonRevenueByCategory2.reduce((sum: number, item: any) => sum + item.amount, 0)) * 100).toFixed(1) : '0';
+                        const total = comparisonRevenueByCategory2 ? comparisonRevenueByCategory2.reduce((sum: number, item: any) => sum + item.amount, 0) : 0;
+                        const percent = data && total > 0 ? ((data.amount / total) * 100).toFixed(1) : '0';
+                        const formattedValue = formatCurrency(data.amount || 0);
                         return (
                           <span style={{
-                            fontSize: window.innerWidth < 640 ? '10px' : '12px',
-                            fontWeight: '500',
+                            fontSize: window.innerWidth < 640 ? '11px' : '13px',
+                            fontWeight: '600',
                             display: 'inline-flex',
                             alignItems: 'center',
-                            gap: '4px'
+                            gap: '6px',
+                            whiteSpace: 'normal',
+                            wordBreak: 'break-word',
+                            lineHeight: '1.5',
+                            textAlign: 'center'
                           }}>
                             <span>{value}:</span>
-                            <span style={{ fontWeight: '700' }}>{percent}%</span>
+                            <span style={{ fontWeight: '700' }}>{formattedValue}</span>
+                            <span style={{ fontWeight: '700', color: 'hsl(var(--muted-foreground))' }}>({percent}%)</span>
                           </span>
                         );
                       }}
@@ -3404,18 +3467,18 @@ export default function Dashboard() {
                   <span className="text-sm sm:text-base md:text-lg">Despesas por Categoria - Período 2</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="overflow-visible px-3 sm:px-6 pb-3 sm:pb-6">
+              <CardContent className="overflow-visible px-3 sm:px-6 pb-4 sm:pb-6">
                 <div ref={comparisonExpenseCategoryChartRef2} className="w-full overflow-visible">
-                  <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 280 : window.innerWidth < 768 ? 320 : getChartHeight()} className={getChartMinHeight()}>
-                    <PieChart>
+                  <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 350 : window.innerWidth < 768 ? 400 : getChartHeight()} className={getChartMinHeight()}>
+                    <PieChart margin={{ top: 10, right: 10, bottom: window.innerWidth < 640 ? 100 : 120, left: 10 }}>
                     <Pie
                       data={comparisonExpensesByCategory2 || []}
                       cx="50%"
-                      cy="50%"
+                      cy={window.innerWidth < 640 ? "42%" : "45%"}
                       labelLine={false}
                       label={false}
-                      outerRadius={window.innerWidth < 640 ? 70 : window.innerWidth < 768 ? 85 : 100}
-                      innerRadius={window.innerWidth < 640 ? 20 : 30}
+                      outerRadius={window.innerWidth < 640 ? 75 : window.innerWidth < 768 ? 90 : 110}
+                      innerRadius={window.innerWidth < 640 ? 25 : 35}
                       fill="#8884d8"
                       dataKey="amount"
                       paddingAngle={2}
@@ -3440,30 +3503,41 @@ export default function Dashboard() {
                     />
                     <Legend 
                       verticalAlign="bottom"
-                      height={window.innerWidth < 640 ? 80 : 100}
+                      height={window.innerWidth < 640 ? 90 : 110}
                       iconType="circle"
                       wrapperStyle={{
-                        paddingTop: window.innerWidth < 640 ? '8px' : '12px',
-                        fontSize: window.innerWidth < 640 ? '10px' : '12px',
+                        paddingTop: window.innerWidth < 640 ? '20px' : '24px',
+                        paddingBottom: window.innerWidth < 640 ? '12px' : '8px',
+                        fontSize: window.innerWidth < 640 ? '11px' : '13px',
+                        fontWeight: '600',
                         display: 'flex',
                         flexWrap: 'wrap',
                         justifyContent: 'center',
-                        gap: window.innerWidth < 640 ? '8px' : '12px'
+                        gap: window.innerWidth < 640 ? '10px' : '14px',
+                        width: '100%',
+                        maxWidth: '100%',
+                        overflow: 'visible'
                       }}
                       formatter={(value, entry: any) => {
                         const data = entry.payload;
-                        const percent = data && comparisonExpensesByCategory2 ? 
-                          ((data.amount / comparisonExpensesByCategory2.reduce((sum: number, item: any) => sum + item.amount, 0)) * 100).toFixed(1) : '0';
+                        const total = comparisonExpensesByCategory2 ? comparisonExpensesByCategory2.reduce((sum: number, item: any) => sum + item.amount, 0) : 0;
+                        const percent = data && total > 0 ? ((data.amount / total) * 100).toFixed(1) : '0';
+                        const formattedValue = formatCurrency(data.amount || 0);
                         return (
                           <span style={{
-                            fontSize: window.innerWidth < 640 ? '10px' : '12px',
-                            fontWeight: '500',
+                            fontSize: window.innerWidth < 640 ? '11px' : '13px',
+                            fontWeight: '600',
                             display: 'inline-flex',
                             alignItems: 'center',
-                            gap: '4px'
+                            gap: '6px',
+                            whiteSpace: 'normal',
+                            wordBreak: 'break-word',
+                            lineHeight: '1.5',
+                            textAlign: 'center'
                           }}>
                             <span>{value}:</span>
-                            <span style={{ fontWeight: '700' }}>{percent}%</span>
+                            <span style={{ fontWeight: '700' }}>{formattedValue}</span>
+                            <span style={{ fontWeight: '700', color: 'hsl(var(--muted-foreground))' }}>({percent}%)</span>
                           </span>
                         );
                       }}
@@ -3487,16 +3561,16 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent className="overflow-visible px-3 sm:px-6 pb-4 sm:pb-6">
               <div ref={revenueCategoryChartRef} className="w-full overflow-visible">
-                <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 320 : window.innerWidth < 768 ? 360 : getChartHeight()} className={getChartMinHeight()}>
-                  <PieChart margin={{ top: 10, right: 10, bottom: window.innerWidth < 640 ? 90 : 100, left: 10 }}>
+                <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 350 : window.innerWidth < 768 ? 400 : getChartHeight()} className={getChartMinHeight()}>
+                  <PieChart margin={{ top: 10, right: 10, bottom: window.innerWidth < 640 ? 100 : 120, left: 10 }}>
                   <Pie
                     data={revenueByCategory || []}
                     cx="50%"
-                    cy={window.innerWidth < 640 ? "45%" : "50%"}
+                    cy={window.innerWidth < 640 ? "42%" : "45%"}
                     labelLine={false}
                     label={false}
-                    outerRadius={window.innerWidth < 640 ? 70 : window.innerWidth < 768 ? 85 : 100}
-                    innerRadius={window.innerWidth < 640 ? 20 : 30}
+                    outerRadius={window.innerWidth < 640 ? 75 : window.innerWidth < 768 ? 90 : 110}
+                    innerRadius={window.innerWidth < 640 ? 25 : 35}
                     fill="#8884d8"
                     dataKey="amount"
                     paddingAngle={2}
@@ -3521,38 +3595,41 @@ export default function Dashboard() {
                   />
                   <Legend 
                     verticalAlign="bottom"
-                    height={window.innerWidth < 640 ? 80 : 100}
+                    height={window.innerWidth < 640 ? 90 : 110}
                     iconType="circle"
                     wrapperStyle={{
-                      paddingTop: window.innerWidth < 640 ? '12px' : '16px',
-                      paddingBottom: window.innerWidth < 640 ? '8px' : '0px',
-                      fontSize: window.innerWidth < 640 ? '10px' : '12px',
+                      paddingTop: window.innerWidth < 640 ? '20px' : '24px',
+                      paddingBottom: window.innerWidth < 640 ? '12px' : '8px',
+                      fontSize: window.innerWidth < 640 ? '11px' : '13px',
+                      fontWeight: '600',
                       display: 'flex',
                       flexWrap: 'wrap',
                       justifyContent: 'center',
-                      gap: window.innerWidth < 640 ? '8px' : '12px',
+                      gap: window.innerWidth < 640 ? '10px' : '14px',
                       width: '100%',
                       maxWidth: '100%',
                       overflow: 'visible'
                     }}
                     formatter={(value, entry: any) => {
                       const data = entry.payload;
-                      const percent = data && revenueByCategory ? 
-                        ((data.amount / revenueByCategory.reduce((sum: number, item: any) => sum + item.amount, 0)) * 100).toFixed(1) : '0';
+                      const total = revenueByCategory ? revenueByCategory.reduce((sum: number, item: any) => sum + item.amount, 0) : 0;
+                      const percent = data && total > 0 ? ((data.amount / total) * 100).toFixed(1) : '0';
+                      const formattedValue = formatCurrency(data.amount || 0);
                       return (
                         <span style={{
-                          fontSize: window.innerWidth < 640 ? '10px' : '12px',
-                          fontWeight: '500',
+                          fontSize: window.innerWidth < 640 ? '11px' : '13px',
+                          fontWeight: '600',
                           display: 'inline-flex',
                           alignItems: 'center',
-                          gap: '4px',
+                          gap: '6px',
                           whiteSpace: 'normal',
                           wordBreak: 'break-word',
-                          lineHeight: '1.4',
+                          lineHeight: '1.5',
                           textAlign: 'center'
                         }}>
                           <span>{value}:</span>
-                          <span style={{ fontWeight: '700' }}>{percent}%</span>
+                          <span style={{ fontWeight: '700' }}>{formattedValue}</span>
+                          <span style={{ fontWeight: '700', color: 'hsl(var(--muted-foreground))' }}>({percent}%)</span>
                         </span>
                       );
                     }}
@@ -3573,16 +3650,16 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent className="overflow-visible px-3 sm:px-6 pb-4 sm:pb-6">
               <div ref={expenseCategoryChartRef} className="w-full overflow-visible">
-                <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 320 : window.innerWidth < 768 ? 360 : getChartHeight()} className={getChartMinHeight()}>
-                  <PieChart margin={{ top: 10, right: 10, bottom: window.innerWidth < 640 ? 90 : 100, left: 10 }}>
+                <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 350 : window.innerWidth < 768 ? 400 : getChartHeight()} className={getChartMinHeight()}>
+                  <PieChart margin={{ top: 10, right: 10, bottom: window.innerWidth < 640 ? 100 : 120, left: 10 }}>
                   <Pie
                     data={expensesByCategory || []}
                     cx="50%"
-                    cy={window.innerWidth < 640 ? "45%" : "50%"}
+                    cy={window.innerWidth < 640 ? "42%" : "45%"}
                     labelLine={false}
                     label={false}
-                    outerRadius={window.innerWidth < 640 ? 70 : window.innerWidth < 768 ? 85 : 100}
-                    innerRadius={window.innerWidth < 640 ? 20 : 30}
+                    outerRadius={window.innerWidth < 640 ? 75 : window.innerWidth < 768 ? 90 : 110}
+                    innerRadius={window.innerWidth < 640 ? 25 : 35}
                     fill="#8884d8"
                     dataKey="amount"
                     paddingAngle={2}
@@ -3607,38 +3684,41 @@ export default function Dashboard() {
                   />
                   <Legend 
                     verticalAlign="bottom"
-                    height={window.innerWidth < 640 ? 80 : 100}
+                    height={window.innerWidth < 640 ? 90 : 110}
                     iconType="circle"
                     wrapperStyle={{
-                      paddingTop: window.innerWidth < 640 ? '12px' : '16px',
-                      paddingBottom: window.innerWidth < 640 ? '8px' : '0px',
-                      fontSize: window.innerWidth < 640 ? '10px' : '12px',
+                      paddingTop: window.innerWidth < 640 ? '20px' : '24px',
+                      paddingBottom: window.innerWidth < 640 ? '12px' : '8px',
+                      fontSize: window.innerWidth < 640 ? '11px' : '13px',
+                      fontWeight: '600',
                       display: 'flex',
                       flexWrap: 'wrap',
                       justifyContent: 'center',
-                      gap: window.innerWidth < 640 ? '8px' : '12px',
+                      gap: window.innerWidth < 640 ? '10px' : '14px',
                       width: '100%',
                       maxWidth: '100%',
                       overflow: 'visible'
                     }}
                     formatter={(value, entry: any) => {
                       const data = entry.payload;
-                      const percent = data && expensesByCategory ? 
-                        ((data.amount / expensesByCategory.reduce((sum: number, item: any) => sum + item.amount, 0)) * 100).toFixed(1) : '0';
+                      const total = expensesByCategory ? expensesByCategory.reduce((sum: number, item: any) => sum + item.amount, 0) : 0;
+                      const percent = data && total > 0 ? ((data.amount / total) * 100).toFixed(1) : '0';
+                      const formattedValue = formatCurrency(data.amount || 0);
                       return (
                         <span style={{
-                          fontSize: window.innerWidth < 640 ? '10px' : '12px',
-                          fontWeight: '500',
+                          fontSize: window.innerWidth < 640 ? '11px' : '13px',
+                          fontWeight: '600',
                           display: 'inline-flex',
                           alignItems: 'center',
-                          gap: '4px',
+                          gap: '6px',
                           whiteSpace: 'normal',
                           wordBreak: 'break-word',
-                          lineHeight: '1.4',
+                          lineHeight: '1.5',
                           textAlign: 'center'
                         }}>
                           <span>{value}:</span>
-                          <span style={{ fontWeight: '700' }}>{percent}%</span>
+                          <span style={{ fontWeight: '700' }}>{formattedValue}</span>
+                          <span style={{ fontWeight: '700', color: 'hsl(var(--muted-foreground))' }}>({percent}%)</span>
                         </span>
                       );
                     }}

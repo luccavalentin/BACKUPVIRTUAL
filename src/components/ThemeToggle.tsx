@@ -24,7 +24,7 @@ export function ThemeToggle() {
       variant="ghost"
       size="icon"
       className={cn(
-        "relative h-9 w-9 rounded-lg border border-border/50",
+        "relative h-4.5 w-4.5 rounded-lg border border-border/50",
         "bg-background/80 backdrop-blur-sm",
         "hover:bg-accent hover:border-primary/50",
         "transition-all duration-200",
@@ -36,14 +36,14 @@ export function ThemeToggle() {
     >
       <Sun
         className={cn(
-          "absolute h-4 w-4 text-yellow-500 transition-all duration-300",
+          "absolute h-2.5 w-2.5 text-yellow-500 transition-all duration-300",
           isDark ? "opacity-0 scale-0 rotate-90" : "opacity-100 scale-100 rotate-0"
         )}
         strokeWidth={2}
       />
       <Moon
         className={cn(
-          "absolute h-4 w-4 text-blue-500 transition-all duration-300",
+          "absolute h-2.5 w-2.5 text-blue-500 transition-all duration-300",
           isDark ? "opacity-100 scale-100 rotate-0" : "opacity-0 scale-0 -rotate-90"
         )}
         strokeWidth={2}
