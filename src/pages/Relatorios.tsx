@@ -39,6 +39,13 @@ import {
 } from "recharts";
 import { formatCurrency } from "@/lib/validations";
 import { formatDateBR } from "@/lib/dateUtils";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import * as XLSX from "xlsx";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
 
 // Função customizada para renderizar labels do gráfico de pizza
 function renderCustomPieLabel({ cx, cy, midAngle, innerRadius, outerRadius, percent, index, category, value }) {
@@ -71,11 +78,11 @@ function renderCustomPieLabel({ cx, cy, midAngle, innerRadius, outerRadius, perc
 const COLORS = ['hsl(var(--primary))', 'hsl(var(--chart-2))', 'hsl(var(--success))', 'hsl(var(--warning))', 'hsl(var(--destructive))'];
 
 export default function Relatorios() {
+  const { toast } = useToast();
   const [revenueDialogOpen, setRevenueDialogOpen] = useState(false);
   const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
   const [balanceDialogOpen, setBalanceDialogOpen] = useState(false);
   const [propertiesDialogOpen, setPropertiesDialogOpen] = useState(false);
-  const [customReportOpen, setCustomReportOpen] = useState(false);
 
   // Receitas por mês
   const { data: revenueByMonth } = useQuery({
@@ -123,7 +130,7 @@ export default function Relatorios() {
     },
   });
 
-  // Receitas vs Despesas
+  // Receitas vs Despesas - ordenado por data
   const { data: revenueVsExpenses } = useQuery({
     queryKey: ["revenue-vs-expenses"],
     queryFn: async () => {
@@ -132,12 +139,30 @@ export default function Relatorios() {
       
       const months = [...new Set([...revenue.map((r: any) => r.month), ...expenses.map((e: any) => e.month)])];
       
-      return months.map(month => ({
-        month,
-        receitas: revenue.find((r: any) => r.month === month)?.amount || 0,
-        despesas: expenses.find((e: any) => e.month === month)?.amount || 0,
-        saldo: (revenue.find((r: any) => r.month === month)?.amount || 0) - (expenses.find((e: any) => e.month === month)?.amount || 0)
-      }));
+      const data = months.map(month => {
+        const revAmount = revenue.find((r: any) => r.month === month)?.amount || 0;
+        const expAmount = expenses.find((e: any) => e.month === month)?.amount || 0;
+        return {
+          month,
+          receitas: revAmount,
+          despesas: expAmount,
+          saldo: revAmount - expAmount
+        };
+      });
+      
+      // Ordenar por data (converter month para Date para ordenação correta)
+      return data.sort((a, b) => {
+        // Formato: "jan/2024" -> converter para Date
+        const parseMonth = (monthStr: string) => {
+          const [month, year] = monthStr.split('/');
+          const monthMap: Record<string, number> = {
+            'jan': 0, 'fev': 1, 'mar': 2, 'abr': 3, 'mai': 4, 'jun': 5,
+            'jul': 6, 'ago': 7, 'set': 8, 'out': 9, 'nov': 10, 'dez': 11
+          };
+          return new Date(parseInt(year), monthMap[month.toLowerCase()] || 0, 1);
+        };
+        return parseMonth(a.month).getTime() - parseMonth(b.month).getTime();
+      });
     },
     enabled: !!revenueByMonth && !!expensesByMonth
   });
@@ -280,63 +305,212 @@ export default function Relatorios() {
     },
   });
 
-  const handleExportPDF = () => {
-    // Implementar exportação para PDF
-    alert("Funcionalidade de exportação em PDF será implementada em breve.");
+  const handleExportPDF = async () => {
+    try {
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const margin = 15;
+      let yPosition = margin;
+
+      // Título
+      doc.setFontSize(18);
+      doc.setFont("helvetica", "bold");
+      doc.text("Relatório Financeiro Completo", pageWidth / 2, yPosition, { align: "center" });
+      yPosition += 10;
+
+      // Data de geração
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      doc.text(`Gerado em: ${format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}`, pageWidth / 2, yPosition, { align: "center" });
+      yPosition += 15;
+
+      // Resumo
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text("Resumo Financeiro", margin, yPosition);
+      yPosition += 8;
+
+      const summaryData = [
+        ["Total de Receitas", formatCurrency(totalRevenue || 0)],
+        ["Total de Despesas", formatCurrency(totalExpenses || 0)],
+        ["Saldo", formatCurrency(saldo)],
+        ["Total de Imóveis", (totalProperties || 0).toString()],
+      ];
+
+      autoTable(doc, {
+        startY: yPosition,
+        head: [["Item", "Valor"]],
+        body: summaryData,
+        theme: "striped",
+        headStyles: { fillColor: [33, 150, 243], textColor: 255, fontStyle: "bold" },
+        styles: { fontSize: 10 },
+        margin: { left: margin, right: margin },
+      });
+
+      yPosition = (doc as any).lastAutoTable.finalY + 15;
+
+      // Receitas por Categoria
+      if (revenueByCategory && revenueByCategory.length > 0) {
+        if (yPosition > 250) {
+          doc.addPage();
+          yPosition = margin;
+        }
+        doc.setFontSize(14);
+        doc.setFont("helvetica", "bold");
+        doc.text("Receitas por Categoria", margin, yPosition);
+        yPosition += 8;
+
+        const revenueData = revenueByCategory.map((item: any) => [
+          item.category || "Sem categoria",
+          formatCurrency(item.amount),
+          `${((item.amount / (totalRevenue || 1)) * 100).toFixed(1)}%`,
+        ]);
+
+        autoTable(doc, {
+          startY: yPosition,
+          head: [["Categoria", "Valor", "Percentual"]],
+          body: revenueData,
+          theme: "striped",
+          headStyles: { fillColor: [33, 150, 243], textColor: 255, fontStyle: "bold" },
+          styles: { fontSize: 9 },
+          margin: { left: margin, right: margin },
+        });
+
+        yPosition = (doc as any).lastAutoTable.finalY + 15;
+      }
+
+      // Despesas por Categoria
+      if (expensesByCategory && expensesByCategory.length > 0) {
+        if (yPosition > 250) {
+          doc.addPage();
+          yPosition = margin;
+        }
+        doc.setFontSize(14);
+        doc.setFont("helvetica", "bold");
+        doc.text("Despesas por Categoria", margin, yPosition);
+        yPosition += 8;
+
+        const expenseData = expensesByCategory.map((item: any) => [
+          item.category || "Sem categoria",
+          formatCurrency(item.amount),
+          `${((item.amount / (totalExpenses || 1)) * 100).toFixed(1)}%`,
+        ]);
+
+        autoTable(doc, {
+          startY: yPosition,
+          head: [["Categoria", "Valor", "Percentual"]],
+          body: expenseData,
+          theme: "striped",
+          headStyles: { fillColor: [244, 67, 54], textColor: 255, fontStyle: "bold" },
+          styles: { fontSize: 9 },
+          margin: { left: margin, right: margin },
+        });
+      }
+
+      const fileName = `Relatorio_Financeiro_${format(new Date(), "dd-MM-yyyy")}.pdf`;
+      doc.save(fileName);
+
+      toast({
+        title: "PDF exportado com sucesso!",
+        description: "O relatório foi salvo no seu dispositivo.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro ao exportar PDF",
+        description: error.message || "Ocorreu um erro ao gerar o PDF.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleExportExcel = () => {
-    // Implementar exportação para Excel
-    alert("Funcionalidade de exportação para Excel será implementada em breve.");
+    try {
+      const wb = XLSX.utils.book_new();
+
+      // Resumo
+      const summaryData = [
+        ["Item", "Valor"],
+        ["Total de Receitas", totalRevenue || 0],
+        ["Total de Despesas", totalExpenses || 0],
+        ["Saldo", saldo],
+        ["Total de Imóveis", totalProperties || 0],
+      ];
+      const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
+      XLSX.utils.book_append_sheet(wb, wsSummary, "Resumo");
+
+      // Receitas por Categoria
+      if (revenueByCategory && revenueByCategory.length > 0) {
+        const revenueData = revenueByCategory.map((item: any) => ({
+          Categoria: item.category || "Sem categoria",
+          Valor: item.amount,
+          Percentual: `${((item.amount / (totalRevenue || 1)) * 100).toFixed(1)}%`,
+        }));
+        const wsRevenue = XLSX.utils.json_to_sheet(revenueData);
+        XLSX.utils.book_append_sheet(wb, wsRevenue, "Receitas");
+      }
+
+      // Despesas por Categoria
+      if (expensesByCategory && expensesByCategory.length > 0) {
+        const expenseData = expensesByCategory.map((item: any) => ({
+          Categoria: item.category || "Sem categoria",
+          Valor: item.amount,
+          Percentual: `${((item.amount / (totalExpenses || 1)) * 100).toFixed(1)}%`,
+        }));
+        const wsExpense = XLSX.utils.json_to_sheet(expenseData);
+        XLSX.utils.book_append_sheet(wb, wsExpense, "Despesas");
+      }
+
+      // Receitas vs Despesas Mensais
+      if (revenueVsExpenses && revenueVsExpenses.length > 0) {
+        const monthlyData = revenueVsExpenses.map((item: any) => ({
+          Mês: item.month,
+          Receitas: item.receitas || 0,
+          Despesas: item.despesas || 0,
+          Saldo: item.saldo || 0,
+        }));
+        const wsMonthly = XLSX.utils.json_to_sheet(monthlyData);
+        XLSX.utils.book_append_sheet(wb, wsMonthly, "Mensal");
+      }
+
+      const fileName = `Relatorio_Financeiro_${format(new Date(), "dd-MM-yyyy")}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+
+      toast({
+        title: "Excel exportado com sucesso!",
+        description: "O relatório foi salvo no seu dispositivo.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro ao exportar Excel",
+        description: error.message || "Ocorreu um erro ao gerar o Excel.",
+        variant: "destructive",
+      });
+    }
   };
 
   const saldo = (totalRevenue || 0) - (totalExpenses || 0);
 
   return (
     <div>
-      <button className="btn btn-primary mb-4" onClick={() => setCustomReportOpen(true)}>
-        Relatório Personalizado
-      </button>
-      <Dialog open={customReportOpen} onOpenChange={setCustomReportOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Relatório Personalizado</DialogTitle>
-            <DialogDescription>
-              Selecione os filtros e opções desejadas para gerar seu relatório personalizado.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 mt-2">
-            <input type="date" className="input input-bordered w-full" placeholder="Data inicial" />
-            <input type="date" className="input input-bordered w-full" placeholder="Data final" />
-            <select className="select select-bordered w-full">
-              <option value="">Categoria</option>
-              <option value="receita">Receita</option>
-              <option value="despesa">Despesa</option>
-              <option value="aplicacao">Aplicação</option>
-            </select>
-            <button className="btn btn-success w-full">Gerar Relatório</button>
-          </div>
-        </DialogContent>
-      </Dialog>
       <PageHeader 
         title="Relatórios" 
         description="Análises detalhadas e visões gerais do seu negócio"
       />
 
       {/* Cards de Resumo */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 md:gap-6 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6">
         <Card 
           className="border-0 shadow-elegant hover:shadow-elegant-lg transition-all duration-300 bg-gradient-card cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
           onClick={() => setRevenueDialogOpen(true)}
         >
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-success" />
+          <CardHeader className="pb-2 sm:pb-3 px-4 sm:px-6 pt-4 sm:pt-6">
+            <CardTitle className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+              <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-success" />
               Total Receitas
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold tracking-tight text-success">{formatCurrency(totalRevenue || 0)}</p>
+          <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+            <p className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-success break-all overflow-wrap-anywhere" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{formatCurrency(totalRevenue || 0)}</p>
           </CardContent>
         </Card>
 
@@ -344,14 +518,14 @@ export default function Relatorios() {
           className="border-0 shadow-elegant hover:shadow-elegant-lg transition-all duration-300 bg-gradient-card cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
           onClick={() => setExpenseDialogOpen(true)}
         >
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-              <TrendingDown className="w-4 h-4 text-destructive" />
+          <CardHeader className="pb-2 sm:pb-3 px-4 sm:px-6 pt-4 sm:pt-6">
+            <CardTitle className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+              <TrendingDown className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-destructive" />
               Total Despesas
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold tracking-tight text-destructive">{formatCurrency(totalExpenses || 0)}</p>
+          <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+            <p className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-destructive break-all overflow-wrap-anywhere" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{formatCurrency(totalExpenses || 0)}</p>
           </CardContent>
         </Card>
 
@@ -359,14 +533,14 @@ export default function Relatorios() {
           className="border-0 shadow-elegant hover:shadow-elegant-lg transition-all duration-300 bg-gradient-card cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
           onClick={() => setBalanceDialogOpen(true)}
         >
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-primary" />
+          <CardHeader className="pb-2 sm:pb-3 px-4 sm:px-6 pt-4 sm:pt-6">
+            <CardTitle className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+              <DollarSign className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
               Saldo
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className={`text-3xl font-bold tracking-tight ${saldo >= 0 ? 'text-success' : 'text-destructive'}`}>
+          <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+            <p className={`text-xl sm:text-2xl md:text-3xl font-bold tracking-tight break-all overflow-wrap-anywhere ${saldo >= 0 ? 'text-success' : 'text-destructive'}`} style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
               {formatCurrency(saldo)}
             </p>
           </CardContent>
@@ -376,27 +550,36 @@ export default function Relatorios() {
           className="border-0 shadow-elegant hover:shadow-elegant-lg transition-all duration-300 bg-gradient-card cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
           onClick={() => setPropertiesDialogOpen(true)}
         >
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-              <Building2 className="w-4 h-4 text-primary" />
+          <CardHeader className="pb-2 sm:pb-3 px-4 sm:px-6 pt-4 sm:pt-6">
+            <CardTitle className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+              <Building2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
               Total Imóveis
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold tracking-tight">{totalProperties || 0}</p>
+          <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+            <p className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight">{totalProperties || 0}</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Botões de Exportação */}
-      <div className="flex gap-4 mb-6">
-        <Button onClick={handleExportPDF} className="gap-2 shadow-elegant hover:shadow-elegant-lg">
+      <div className="flex flex-wrap gap-3 mb-6">
+        <Button 
+          onClick={handleExportPDF} 
+          className="gap-2 shadow-elegant hover:shadow-elegant-lg bg-primary hover:bg-primary/90"
+        >
           <FileText className="w-4 h-4" />
-          Exportar PDF
+          <span className="hidden sm:inline">Exportar PDF</span>
+          <span className="sm:hidden">PDF</span>
         </Button>
-        <Button onClick={handleExportExcel} variant="outline" className="gap-2 shadow-sm hover:shadow-elegant">
+        <Button 
+          onClick={handleExportExcel} 
+          variant="outline" 
+          className="gap-2 shadow-sm hover:shadow-elegant border-primary/30 hover:border-primary"
+        >
           <Download className="w-4 h-4" />
-          Exportar Excel
+          <span className="hidden sm:inline">Exportar Excel</span>
+          <span className="sm:hidden">Excel</span>
         </Button>
       </div>
 
@@ -410,28 +593,35 @@ export default function Relatorios() {
               Receitas vs Despesas
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
             <div className="flex flex-col items-center w-full">
-              <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={revenueVsExpenses || []}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+              <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 250 : 300}>
+                <AreaChart data={revenueVsExpenses || []} margin={{ top: 5, right: 10, left: 0, bottom: window.innerWidth < 640 ? 60 : 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
                   <XAxis 
                     dataKey="month" 
                     className="text-xs"
-                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: window.innerWidth < 640 ? 10 : 12 }}
+                    angle={window.innerWidth < 640 ? -45 : 0}
+                    textAnchor={window.innerWidth < 640 ? "end" : "middle"}
+                    height={window.innerWidth < 640 ? 60 : 30}
                   />
                   <YAxis 
                     className="text-xs"
-                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: window.innerWidth < 640 ? 10 : 12 }}
                     tickFormatter={(value) => `R$ ${(value / 1000).toFixed(0)}k`}
+                    width={window.innerWidth < 640 ? 50 : 60}
                   />
                   <Tooltip 
                     contentStyle={{ 
                       backgroundColor: 'hsl(var(--popover))', 
                       border: '1px solid hsl(var(--border))',
-                      borderRadius: '0.5rem'
+                      borderRadius: '0.75rem',
+                      padding: '8px 12px',
+                      fontSize: window.innerWidth < 640 ? '11px' : '13px'
                     }}
                     formatter={(value: any) => formatCurrency(value)}
+                    labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
                   />
                   <Area 
                     type="monotone" 
@@ -453,69 +643,86 @@ export default function Relatorios() {
                   />
                 </AreaChart>
               </ResponsiveContainer>
-              <div
-                className="w-full flex flex-col justify-center items-center gap-2 mt-2 mb-1 px-2"
-                style={{
-                  maxHeight: '64px',
-                  overflow: 'auto',
-                  wordBreak: 'break-word',
-                  lineHeight: '1.4',
-                  fontSize: '1rem',
-                  fontWeight: 500,
-                  color: 'hsl(var(--muted-foreground))',
-                  textAlign: 'center',
+              <Legend 
+                wrapperStyle={{ 
+                  paddingTop: '12px',
+                  fontSize: window.innerWidth < 640 ? '11px' : '13px'
                 }}
-              >
-                <span className="flex items-center gap-2 w-full justify-center">
-                  <span style={{ width: 18, height: 18, background: 'hsl(var(--success))', borderRadius: 4, display: 'inline-block' }}></span>
-                  <span style={{ whiteSpace: 'nowrap' }}>Receitas</span>
-                </span>
-                <span className="flex items-center gap-2 w-full justify-center">
-                  <span style={{ width: 18, height: 18, background: 'hsl(var(--destructive))', borderRadius: 4, display: 'inline-block' }}></span>
-                  <span style={{ whiteSpace: 'nowrap' }}>Despesas</span>
-                </span>
-              </div>
+                iconType="square"
+                iconSize={12}
+                formatter={(value) => (
+                  <span style={{ 
+                    fontSize: window.innerWidth < 640 ? '11px' : '13px',
+                    fontWeight: '500',
+                    color: 'hsl(var(--foreground))'
+                  }}>
+                    {value}
+                  </span>
+                )}
+              />
             </div>
           </CardContent>
         </Card>
 
         {/* Saldo Mensal */}
         <Card className="border-0 shadow-elegant">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-xl font-bold tracking-tight flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-primary" />
-              Saldo Mensal
+          <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-6">
+            <CardTitle className="text-base sm:text-lg md:text-xl font-bold tracking-tight flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+              <span className="text-sm sm:text-base md:text-lg">Saldo Mensal</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={revenueVsExpenses || []}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+          <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
+            <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 280 : 300}>
+              <LineChart data={revenueVsExpenses || []} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
                 <XAxis 
                   dataKey="month" 
                   className="text-xs"
-                  tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                  tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: window.innerWidth < 640 ? 10 : 12 }}
+                  angle={window.innerWidth < 640 ? -45 : 0}
+                  textAnchor={window.innerWidth < 640 ? "end" : "middle"}
+                  height={window.innerWidth < 640 ? 60 : 30}
                 />
                 <YAxis 
                   className="text-xs"
-                  tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                  tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: window.innerWidth < 640 ? 10 : 12 }}
                   tickFormatter={(value) => `R$ ${(value / 1000).toFixed(0)}k`}
+                  width={window.innerWidth < 640 ? 50 : 60}
                 />
                 <Tooltip 
                   contentStyle={{ 
                     backgroundColor: 'hsl(var(--popover))', 
                     border: '1px solid hsl(var(--border))',
-                    borderRadius: '0.5rem'
+                    borderRadius: '0.75rem',
+                    padding: '8px 12px',
+                    fontSize: window.innerWidth < 640 ? '11px' : '13px'
                   }}
                   formatter={(value: any) => formatCurrency(value)}
+                  labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
                 />
                 <Line 
                   type="monotone" 
                   dataKey="saldo" 
                   stroke="hsl(var(--primary))" 
-                  strokeWidth={3}
-                  dot={{ fill: 'hsl(var(--primary))', r: 4 }}
-                  name="Saldo"
+                  strokeWidth={window.innerWidth < 640 ? 2.5 : 3}
+                  dot={{ fill: 'hsl(var(--primary))', r: window.innerWidth < 640 ? 3 : 4 }}
+                  activeDot={{ r: window.innerWidth < 640 ? 5 : 6 }}
+                  name="Saldo Mensal"
+                />
+                <Legend 
+                  wrapperStyle={{ paddingTop: '12px' }}
+                  iconType="line"
+                  iconSize={12}
+                  formatter={(value) => (
+                    <span style={{ 
+                      fontSize: window.innerWidth < 640 ? '11px' : '12px', 
+                      fontWeight: '500',
+                      color: 'hsl(var(--foreground))'
+                    }}>
+                      {value}
+                    </span>
+                  )}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -679,41 +886,236 @@ export default function Relatorios() {
 
       {/* Gráfico de Barras - Receitas e Despesas Mensais */}
       <Card className="border-0 shadow-elegant mb-6">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-xl font-bold tracking-tight flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-primary" />
-            Análise Mensal Detalhada
+        <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-6">
+          <CardTitle className="text-base sm:text-lg md:text-xl font-bold tracking-tight flex items-center gap-2">
+            <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+            <span className="text-sm sm:text-base md:text-lg">Análise Mensal Detalhada</span>
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={400}>
-            <BarChart data={revenueVsExpenses || []}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+        <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
+          <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 300 : 400}>
+            <BarChart data={revenueVsExpenses || []} margin={{ top: 10, right: 10, left: 0, bottom: window.innerWidth < 640 ? 60 : 5 }}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
               <XAxis 
                 dataKey="month" 
                 className="text-xs"
-                tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: window.innerWidth < 640 ? 10 : 12 }}
+                angle={window.innerWidth < 640 ? -45 : 0}
+                textAnchor={window.innerWidth < 640 ? "end" : "middle"}
+                height={window.innerWidth < 640 ? 60 : 30}
               />
               <YAxis 
                 className="text-xs"
-                tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: window.innerWidth < 640 ? 10 : 12 }}
                 tickFormatter={(value) => `R$ ${(value / 1000).toFixed(0)}k`}
+                width={window.innerWidth < 640 ? 50 : 60}
               />
               <Tooltip 
                 contentStyle={{ 
                   backgroundColor: 'hsl(var(--popover))', 
                   border: '1px solid hsl(var(--border))',
-                  borderRadius: '0.5rem'
+                  borderRadius: '0.75rem',
+                  padding: '8px 12px',
+                  fontSize: window.innerWidth < 640 ? '11px' : '13px'
                 }}
                 formatter={(value: any) => formatCurrency(value)}
+                labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
               />
-              <Legend />
-              <Bar dataKey="receitas" fill="hsl(var(--success))" name="Receitas" radius={[8, 8, 0, 0]} />
-              <Bar dataKey="despesas" fill="hsl(var(--destructive))" name="Despesas" radius={[8, 8, 0, 0]} />
+              <Legend 
+                wrapperStyle={{ 
+                  paddingTop: '12px',
+                  fontSize: window.innerWidth < 640 ? '11px' : '13px'
+                }}
+                iconType="square"
+                iconSize={12}
+                formatter={(value) => (
+                  <span style={{ 
+                    fontSize: window.innerWidth < 640 ? '11px' : '13px',
+                    fontWeight: '500',
+                    color: 'hsl(var(--foreground))'
+                  }}>
+                    {value}
+                  </span>
+                )}
+              />
+              <Bar dataKey="receitas" fill="hsl(var(--success))" name="Receitas" radius={[6, 6, 0, 0]} barSize={window.innerWidth < 640 ? 20 : 30} />
+              <Bar dataKey="despesas" fill="hsl(var(--destructive))" name="Despesas" radius={[6, 6, 0, 0]} barSize={window.innerWidth < 640 ? 20 : 30} />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
       </Card>
+
+      {/* Dialogs para detalhes dos cards */}
+      <Dialog open={revenueDialogOpen} onOpenChange={setRevenueDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-success to-success/70 bg-clip-text text-transparent">
+              Detalhes de Receitas
+            </DialogTitle>
+            <DialogDescription>
+              Total: {formatCurrency(totalRevenue || 0)} - {revenueDetails?.length || 0} registro(s)
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4">
+            {revenueDetails && revenueDetails.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Descrição</TableHead>
+                    <TableHead>Data</TableHead>
+                    <TableHead>Categoria</TableHead>
+                    <TableHead>Valor</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {revenueDetails.map((revenue: any) => (
+                    <TableRow key={revenue.id}>
+                      <TableCell>{revenue.description || "-"}</TableCell>
+                      <TableCell>{format(new Date(revenue.date), "dd/MM/yyyy", { locale: ptBR })}</TableCell>
+                      <TableCell>{revenue.category || "-"}</TableCell>
+                      <TableCell className="font-semibold text-success">{formatCurrency(Number(revenue.amount || 0))}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <p className="text-center text-muted-foreground py-8">Nenhuma receita encontrada.</p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={expenseDialogOpen} onOpenChange={setExpenseDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-destructive to-destructive/70 bg-clip-text text-transparent">
+              Detalhes de Despesas
+            </DialogTitle>
+            <DialogDescription>
+              Total: {formatCurrency(totalExpenses || 0)} - {expenseDetails?.length || 0} registro(s)
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4">
+            {expenseDetails && expenseDetails.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Descrição</TableHead>
+                    <TableHead>Data</TableHead>
+                    <TableHead>Categoria</TableHead>
+                    <TableHead>Valor</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {expenseDetails.map((expense: any) => (
+                    <TableRow key={expense.id}>
+                      <TableCell>{expense.description || "-"}</TableCell>
+                      <TableCell>{format(new Date(expense.date), "dd/MM/yyyy", { locale: ptBR })}</TableCell>
+                      <TableCell>{expense.category || "-"}</TableCell>
+                      <TableCell className="font-semibold text-destructive">{formatCurrency(Number(expense.amount || 0))}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <p className="text-center text-muted-foreground py-8">Nenhuma despesa encontrada.</p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={balanceDialogOpen} onOpenChange={setBalanceDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+              Detalhes do Saldo
+            </DialogTitle>
+            <DialogDescription>
+              Saldo Total: <span className={`font-bold ${saldo >= 0 ? 'text-success' : 'text-destructive'}`}>{formatCurrency(saldo)}</span>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4 space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <Card className="p-4 bg-success/10 border-success/30">
+                <p className="text-sm text-muted-foreground">Total de Receitas</p>
+                <p className="text-2xl font-bold text-success">{formatCurrency(totalRevenue || 0)}</p>
+              </Card>
+              <Card className="p-4 bg-destructive/10 border-destructive/30">
+                <p className="text-sm text-muted-foreground">Total de Despesas</p>
+                <p className="text-2xl font-bold text-destructive">{formatCurrency(totalExpenses || 0)}</p>
+              </Card>
+            </div>
+            <div className="space-y-2">
+              <h3 className="font-semibold">Saldo Mensal</h3>
+              {revenueVsExpenses && revenueVsExpenses.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Mês</TableHead>
+                      <TableHead>Receitas</TableHead>
+                      <TableHead>Despesas</TableHead>
+                      <TableHead>Saldo</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {revenueVsExpenses.map((item: any, index: number) => (
+                      <TableRow key={index}>
+                        <TableCell>{item.month}</TableCell>
+                        <TableCell className="text-success">{formatCurrency(item.receitas || 0)}</TableCell>
+                        <TableCell className="text-destructive">{formatCurrency(item.despesas || 0)}</TableCell>
+                        <TableCell className={`font-semibold ${(item.saldo || 0) >= 0 ? 'text-success' : 'text-destructive'}`}>
+                          {formatCurrency(item.saldo || 0)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <p className="text-center text-muted-foreground py-4">Nenhum dado disponível.</p>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={propertiesDialogOpen} onOpenChange={setPropertiesDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+              Detalhes de Imóveis
+            </DialogTitle>
+            <DialogDescription>
+              Total: {totalProperties || 0} imóvel(is) cadastrado(s)
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4">
+            {propertiesDetails && propertiesDetails.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Endereço</TableHead>
+                    <TableHead>Tipo</TableHead>
+                    <TableHead>Valor</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {propertiesDetails.map((property: any) => (
+                    <TableRow key={property.id}>
+                      <TableCell>{property.address || "-"}</TableCell>
+                      <TableCell>{property.type || "-"}</TableCell>
+                      <TableCell>{property.value ? formatCurrency(Number(property.value)) : "-"}</TableCell>
+                      <TableCell>{property.status || "-"}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <p className="text-center text-muted-foreground py-8">Nenhum imóvel cadastrado.</p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

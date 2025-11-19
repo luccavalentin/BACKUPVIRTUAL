@@ -169,8 +169,8 @@ export default function Clientes() {
       const { error } = await supabase.from("clients").delete().eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["clients"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["clients"] });
       toast({ title: "Cliente excluído com sucesso!" });
       setDeleteDialogOpen(false);
       setClientToDelete(null);

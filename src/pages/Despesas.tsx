@@ -154,8 +154,8 @@ export default function Despesas() {
       const { error } = await supabase.from("expenses").delete().eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["expenses"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["expenses"] });
       toast({ title: "Despesa excluída com sucesso!" });
     },
     onError: (error: any) => {

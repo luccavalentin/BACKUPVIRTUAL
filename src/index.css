@@ -45,16 +45,36 @@ All colors MUST be HSL.
     }
     
     * {
-      scrollbar-width: thin;
+      scrollbar-width: auto;
+      scrollbar-color: hsl(var(--primary)) hsl(var(--muted) / 0.5);
     }
     
     *::-webkit-scrollbar {
-      width: 12px;
-      height: 12px;
+      width: 14px;
+      height: 14px;
+      display: block !important;
+    }
+    
+    *::-webkit-scrollbar-track {
+      background: hsl(var(--muted) / 0.6);
+      border-radius: 10px;
+      border: 2px solid hsl(var(--background));
     }
     
     *::-webkit-scrollbar-thumb {
-      box-shadow: 0 0 0 2px hsl(var(--background)) inset;
+      background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+      border-radius: 10px;
+      border: 3px solid hsl(var(--background));
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    *::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(135deg, hsl(var(--primary) / 0.9), hsl(var(--accent) / 0.9));
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+    }
+    
+    *::-webkit-scrollbar-corner {
+      background: hsl(var(--background));
     }
     
     /* Better touch targets */

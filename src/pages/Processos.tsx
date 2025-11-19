@@ -168,8 +168,8 @@ export default function Processos() {
       const { error } = await supabase.from("revenue").insert([data]);
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["revenues"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["revenues"] });
       toast({ title: "Receita cadastrada com sucesso!" });
       setRevenueDialogOpen(false);
       setRevenueFormData({
@@ -246,8 +246,8 @@ export default function Processos() {
       const { error } = await supabase.from("legal_processes").update(data).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["legal_processes"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["legal_processes"] });
       toast({ title: "Processo atualizado com sucesso!" });
       handleCloseDialog();
     },
@@ -265,8 +265,8 @@ export default function Processos() {
       const { error } = await supabase.from("legal_processes").delete().eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["legal_processes"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["legal_processes"] });
       toast({ title: "Processo excluído com sucesso!" });
       setDeleteDialogOpen(false);
       setProcessToDelete(null);

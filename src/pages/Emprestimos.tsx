@@ -250,10 +250,17 @@ export default function Emprestimos() {
       const { error } = await supabase.from("loans").update(data).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["loans"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["loans"] });
       toast({ title: "Empréstimo atualizado com sucesso!" });
       handleCloseDialog();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao atualizar empréstimo",
+        description: error.message || "Ocorreu um erro ao atualizar. Tente novamente.",
+        variant: "destructive",
+      });
     },
   });
 
@@ -262,8 +269,8 @@ export default function Emprestimos() {
       const { error } = await supabase.from("loans").delete().eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["loans"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["loans"] });
       toast({ title: "Empréstimo excluído com sucesso!" });
       setDeleteDialogOpen(false);
       setLoanToDelete(null);
@@ -274,6 +281,8 @@ export default function Emprestimos() {
         description: error.message || "Ocorreu um erro ao excluir. Tente novamente.",
         variant: "destructive",
       });
+      setDeleteDialogOpen(false);
+      setLoanToDelete(null);
     },
   });
 

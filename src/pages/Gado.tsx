@@ -118,8 +118,8 @@ export default function Gado() {
       const { error } = await supabase.from("cattle").insert([data]);
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cattle"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["cattle"] });
       toast({ title: "Gado cadastrado com sucesso!" });
       if (keepDialogOpen) {
         setFormData({
@@ -135,8 +135,15 @@ export default function Gado() {
         });
         setKeepDialogOpen(false);
       } else {
-      handleCloseDialog();
+        handleCloseDialog();
       }
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao cadastrar gado",
+        description: error.message || "Ocorreu um erro ao salvar. Tente novamente.",
+        variant: "destructive",
+      });
     },
   });
 
@@ -145,10 +152,17 @@ export default function Gado() {
       const { error } = await supabase.from("cattle").update(data).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cattle"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["cattle"] });
       toast({ title: "Gado atualizado com sucesso!" });
       handleCloseDialog();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao atualizar gado",
+        description: error.message || "Ocorreu um erro ao atualizar. Tente novamente.",
+        variant: "destructive",
+      });
     },
   });
 
@@ -157,8 +171,8 @@ export default function Gado() {
       const { error } = await supabase.from("cattle").delete().eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cattle"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["cattle"] });
       toast({ title: "Gado excluído com sucesso!" });
       setDeleteDialogOpen(false);
       setCattleToDelete(null);
@@ -169,6 +183,8 @@ export default function Gado() {
         description: error.message || "Ocorreu um erro ao excluir. Tente novamente.",
         variant: "destructive",
       });
+      setDeleteDialogOpen(false);
+      setCattleToDelete(null);
     },
   });
 

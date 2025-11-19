@@ -156,9 +156,16 @@ export default function Receitas() {
       const { error } = await supabase.from("revenue").delete().eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["revenues"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["revenues"] });
       toast({ title: "Receita excluída com sucesso!" });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao excluir receita",
+        description: error.message || "Ocorreu um erro ao excluir. Tente novamente.",
+        variant: "destructive",
+      });
     },
   });
 
