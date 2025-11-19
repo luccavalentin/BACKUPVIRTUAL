@@ -16,17 +16,20 @@ import {
   ChevronDown,
   Wallet as WalletIcon,
   BarChart3,
-  X
+  X,
+  LogOut
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const menuItems = [
   { icon: PiggyBank, label: "Aplicações", path: "/aplicacoes" },
@@ -51,6 +54,40 @@ const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => {
   const [isFinanceiroOpen, setIsFinanceiroOpen] = useState(false);
   const [isFinanceiroClicked, setIsFinanceiroClicked] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  // Handler para logout
+  const handleLogout = async () => {
+    try {
+      // Limpa sessão do Supabase
+      await supabase.auth.signOut();
+      
+      // Limpa dados locais
+      localStorage.removeItem("rememberMe");
+      localStorage.removeItem("userEmail");
+      
+      // Fecha menu mobile se estiver aberto
+      if (onNavigate) {
+        onNavigate();
+      }
+      
+      toast({
+        title: "Logout realizado",
+        description: "Você foi desconectado com sucesso.",
+      });
+      
+      // Redireciona para login
+      navigate("/login", { replace: true });
+    } catch (error: any) {
+      console.error("Erro ao fazer logout:", error);
+      toast({
+        title: "Erro ao fazer logout",
+        description: error.message || "Ocorreu um erro. Tente novamente.",
+        variant: "destructive",
+      });
+    }
+  };
 
   // Verifica se algum subitem está ativo para destacar o menu pai
   const isFinanceiroActive = financeiroSubItems.some(item => location.pathname === item.path);
@@ -183,6 +220,18 @@ const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => {
             </li>
           </ul>
         </nav>
+
+        {/* Botão de Logout no final do menu */}
+        <div className="p-4 border-t border-sidebar-border/50">
+          <Button
+            variant="ghost"
+            onClick={handleLogout}
+            className="w-full justify-start gap-3 px-4 py-3 text-sidebar-foreground/90 hover:bg-destructive/10 hover:text-destructive transition-colors duration-150 font-medium"
+          >
+            <LogOut className="w-5 h-5" strokeWidth={2.5} />
+            <span className="whitespace-nowrap">Sair</span>
+          </Button>
+        </div>
     </div>
   );
 };

@@ -343,6 +343,7 @@ export default function Faturamento() {
         <PageHeader
           title="Faturamento"
           description="Soma de todas as receitas cadastradas por categoria e mês"
+          showBackButton={true}
         />
         <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2">
           <div className="flex items-center gap-2 px-4 py-2 rounded-2xl border border-primary/20 bg-primary/5 text-primary font-semibold text-sm shadow-[0_6px_18px_rgba(15,23,42,0.08)]">

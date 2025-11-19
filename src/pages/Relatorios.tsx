@@ -495,6 +495,7 @@ export default function Relatorios() {
       <PageHeader 
         title="Relatórios" 
         description="Análises detalhadas e visões gerais do seu negócio"
+        showBackButton={false}
       />
 
       {/* Cards de Resumo */}

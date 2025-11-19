@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Plus, LucideIcon } from "lucide-react";
+import { BackButton } from "./BackButton";
 
 interface PageHeaderProps {
   title: string;
@@ -9,12 +10,18 @@ interface PageHeaderProps {
     onClick: () => void;
     icon?: LucideIcon;
   };
+  showBackButton?: boolean;
 }
 
-export function PageHeader({ title, description, action }: PageHeaderProps) {
+export function PageHeader({ title, description, action, showBackButton = true }: PageHeaderProps) {
   if (!action) {
     return (
       <div className="flex flex-col items-center justify-center text-center mb-8 md:mb-10 relative">
+        {showBackButton && (
+          <div className="absolute left-0 top-0 z-20">
+            <BackButton />
+          </div>
+        )}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="w-64 h-64 bg-primary/5 rounded-full blur-3xl opacity-50" />
         </div>
@@ -34,6 +41,11 @@ export function PageHeader({ title, description, action }: PageHeaderProps) {
 
   return (
     <div className="flex flex-col items-center justify-center text-center gap-5 mb-8 md:mb-10 relative">
+      {showBackButton && (
+        <div className="absolute left-0 top-0 z-20">
+          <BackButton />
+        </div>
+      )}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-30">
         <div className="w-64 md:w-80 h-64 md:h-80 bg-primary/5 rounded-full blur-3xl" />
       </div>
