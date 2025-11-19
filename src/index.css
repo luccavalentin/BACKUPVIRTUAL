@@ -640,4 +640,16 @@ All colors MUST be HSL.
       opacity: 0;
     }
   }
+
+  /* Esconder scrollbar na sidebar no desktop */
+  @media (min-width: 768px) {
+    .sidebar-nav-desktop {
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE and Edge */
+    }
+
+    .sidebar-nav-desktop::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, Opera */
+    }
+  }
 }

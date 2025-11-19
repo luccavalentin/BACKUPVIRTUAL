@@ -768,12 +768,12 @@ export default function Relatorios() {
             </CardTitle>
           </CardHeader>
           <CardContent className="px-3 sm:px-6 pb-4 sm:pb-6">
-            <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 420 : window.innerWidth < 768 ? 480 : 520} className="min-h-[420px] sm:min-h-[480px] md:min-h-[520px]">
-              <RechartsPieChart margin={{ top: window.innerWidth < 640 ? 40 : 50, right: 10, bottom: window.innerWidth < 640 ? 140 : 160, left: 10 }}>
+            <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 500 : window.innerWidth < 768 ? 580 : 650} className="min-h-[500px] sm:min-h-[580px] md:min-h-[650px]">
+              <RechartsPieChart margin={{ top: window.innerWidth < 640 ? 40 : 50, right: 10, bottom: window.innerWidth < 640 ? 200 : 240, left: 10 }}>
                 <Pie
                   data={revenueByCategory || []}
                   cx="50%"
-                  cy={window.innerWidth < 640 ? "40%" : "42%"}
+                  cy={window.innerWidth < 640 ? "35%" : "38%"}
                   labelLine={false}
                   label={false}
                   outerRadius={window.innerWidth < 640 ? 70 : window.innerWidth < 768 ? 85 : 100}
@@ -802,23 +802,22 @@ export default function Relatorios() {
                 />
                 <Legend 
                   verticalAlign="bottom"
-                  height={window.innerWidth < 640 ? 130 : 150}
+                  height={window.innerWidth < 640 ? 180 : 220}
                   iconType="circle"
                   wrapperStyle={{
-                    paddingTop: window.innerWidth < 640 ? '30px' : '35px',
-                    paddingBottom: window.innerWidth < 640 ? '20px' : '25px',
+                    paddingTop: window.innerWidth < 640 ? '20px' : '25px',
+                    paddingBottom: window.innerWidth < 640 ? '10px' : '15px',
                     fontSize: window.innerWidth < 640 ? '11px' : '13px',
                     fontWeight: '600',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    flexWrap: 'wrap',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    gap: window.innerWidth < 640 ? '12px' : '16px',
+                    display: 'grid',
+                    gridTemplateColumns: window.innerWidth < 640 ? 'repeat(2, 1fr)' : window.innerWidth < 768 ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
+                    gap: window.innerWidth < 640 ? '12px 8px' : '16px 12px',
                     width: '100%',
                     maxWidth: '100%',
                     overflow: 'visible',
-                    lineHeight: '1.8'
+                    lineHeight: '1.8',
+                    justifyContent: 'center',
+                    alignItems: 'start'
                   }}
                   formatter={(value, entry: any, index: number) => {
                     const data = entry.payload;
@@ -832,23 +831,33 @@ export default function Relatorios() {
                         fontWeight: '600',
                         display: 'flex',
                         flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: '6px',
+                        alignItems: 'flex-start',
+                        gap: '4px',
                         whiteSpace: 'normal',
                         wordBreak: 'break-word',
-                        lineHeight: '1.6',
-                        textAlign: 'center',
-                        marginBottom: window.innerWidth < 640 ? '12px' : '14px',
-                        padding: '6px 10px',
-                        minWidth: window.innerWidth < 640 ? '120px' : '140px'
+                        lineHeight: '1.5',
+                        textAlign: 'left',
+                        padding: '8px 10px',
+                        width: '100%',
+                        minWidth: window.innerWidth < 640 ? '100px' : '120px'
                       }}>
-                        <span style={{ fontWeight: '700', fontSize: window.innerWidth < 640 ? '12px' : '14px', color: 'hsl(var(--foreground))' }}>
-                          {categoryName}
-                        </span>
-                        <span style={{ fontWeight: '800', color: 'hsl(var(--primary))', fontSize: window.innerWidth < 640 ? '13px' : '15px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ 
+                            width: '10px', 
+                            height: '10px', 
+                            borderRadius: '50%', 
+                            backgroundColor: entry.color || COLORS[index % COLORS.length],
+                            display: 'inline-block',
+                            flexShrink: 0
+                          }}></span>
+                          <span style={{ fontWeight: '700', fontSize: window.innerWidth < 640 ? '12px' : '14px', color: 'hsl(var(--foreground))' }}>
+                            {categoryName}
+                          </span>
+                        </div>
+                        <span style={{ fontWeight: '800', color: 'hsl(var(--primary))', fontSize: window.innerWidth < 640 ? '13px' : '15px', marginLeft: '16px' }}>
                           R$ {formattedValue.replace('R$', '').trim()}
                         </span>
-                        <span style={{ fontWeight: '600', color: 'hsl(var(--muted-foreground))', fontSize: window.innerWidth < 640 ? '10px' : '12px' }}>
+                        <span style={{ fontWeight: '600', color: 'hsl(var(--muted-foreground))', fontSize: window.innerWidth < 640 ? '10px' : '12px', marginLeft: '16px' }}>
                           {percent}% do total
                         </span>
                       </div>
@@ -869,12 +878,12 @@ export default function Relatorios() {
             </CardTitle>
           </CardHeader>
           <CardContent className="px-3 sm:px-6 pb-4 sm:pb-6">
-            <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 420 : window.innerWidth < 768 ? 480 : 520} className="min-h-[420px] sm:min-h-[480px] md:min-h-[520px]">
-              <RechartsPieChart margin={{ top: window.innerWidth < 640 ? 40 : 50, right: 10, bottom: window.innerWidth < 640 ? 140 : 160, left: 10 }}>
+            <ResponsiveContainer width="100%" height={window.innerWidth < 640 ? 500 : window.innerWidth < 768 ? 580 : 650} className="min-h-[500px] sm:min-h-[580px] md:min-h-[650px]">
+              <RechartsPieChart margin={{ top: window.innerWidth < 640 ? 40 : 50, right: 10, bottom: window.innerWidth < 640 ? 200 : 240, left: 10 }}>
                 <Pie
                   data={expensesByCategory || []}
                   cx="50%"
-                  cy={window.innerWidth < 640 ? "40%" : "42%"}
+                  cy={window.innerWidth < 640 ? "35%" : "38%"}
                   labelLine={false}
                   label={false}
                   outerRadius={window.innerWidth < 640 ? 70 : window.innerWidth < 768 ? 85 : 100}
@@ -903,23 +912,22 @@ export default function Relatorios() {
                 />
                 <Legend 
                   verticalAlign="bottom"
-                  height={window.innerWidth < 640 ? 130 : 150}
+                  height={window.innerWidth < 640 ? 180 : 220}
                   iconType="circle"
                   wrapperStyle={{
-                    paddingTop: window.innerWidth < 640 ? '30px' : '35px',
-                    paddingBottom: window.innerWidth < 640 ? '20px' : '25px',
+                    paddingTop: window.innerWidth < 640 ? '20px' : '25px',
+                    paddingBottom: window.innerWidth < 640 ? '10px' : '15px',
                     fontSize: window.innerWidth < 640 ? '11px' : '13px',
                     fontWeight: '600',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    flexWrap: 'wrap',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    gap: window.innerWidth < 640 ? '12px' : '16px',
+                    display: 'grid',
+                    gridTemplateColumns: window.innerWidth < 640 ? 'repeat(2, 1fr)' : window.innerWidth < 768 ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
+                    gap: window.innerWidth < 640 ? '12px 8px' : '16px 12px',
                     width: '100%',
                     maxWidth: '100%',
                     overflow: 'visible',
-                    lineHeight: '1.8'
+                    lineHeight: '1.8',
+                    justifyContent: 'center',
+                    alignItems: 'start'
                   }}
                   formatter={(value, entry: any, index: number) => {
                     const data = entry.payload;
@@ -933,23 +941,33 @@ export default function Relatorios() {
                         fontWeight: '600',
                         display: 'flex',
                         flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: '6px',
+                        alignItems: 'flex-start',
+                        gap: '4px',
                         whiteSpace: 'normal',
                         wordBreak: 'break-word',
-                        lineHeight: '1.6',
-                        textAlign: 'center',
-                        marginBottom: window.innerWidth < 640 ? '12px' : '14px',
-                        padding: '6px 10px',
-                        minWidth: window.innerWidth < 640 ? '120px' : '140px'
+                        lineHeight: '1.5',
+                        textAlign: 'left',
+                        padding: '8px 10px',
+                        width: '100%',
+                        minWidth: window.innerWidth < 640 ? '100px' : '120px'
                       }}>
-                        <span style={{ fontWeight: '700', fontSize: window.innerWidth < 640 ? '12px' : '14px', color: 'hsl(var(--foreground))' }}>
-                          {categoryName}
-                        </span>
-                        <span style={{ fontWeight: '800', color: 'hsl(var(--destructive))', fontSize: window.innerWidth < 640 ? '13px' : '15px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ 
+                            width: '10px', 
+                            height: '10px', 
+                            borderRadius: '50%', 
+                            backgroundColor: entry.color || COLORS[index % COLORS.length],
+                            display: 'inline-block',
+                            flexShrink: 0
+                          }}></span>
+                          <span style={{ fontWeight: '700', fontSize: window.innerWidth < 640 ? '12px' : '14px', color: 'hsl(var(--foreground))' }}>
+                            {categoryName}
+                          </span>
+                        </div>
+                        <span style={{ fontWeight: '800', color: 'hsl(var(--destructive))', fontSize: window.innerWidth < 640 ? '13px' : '15px', marginLeft: '16px' }}>
                           R$ {formattedValue.replace('R$', '').trim()}
                         </span>
-                        <span style={{ fontWeight: '600', color: 'hsl(var(--muted-foreground))', fontSize: window.innerWidth < 640 ? '10px' : '12px' }}>
+                        <span style={{ fontWeight: '600', color: 'hsl(var(--muted-foreground))', fontSize: window.innerWidth < 640 ? '10px' : '12px', marginLeft: '16px' }}>
                           {percent}% do total
                         </span>
                       </div>

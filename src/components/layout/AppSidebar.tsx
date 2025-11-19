@@ -146,7 +146,7 @@ const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => {
           </div>
         </div>
         
-        <nav className="flex-1 overflow-y-auto p-4 scrollbar-none">
+        <nav className="flex-1 overflow-y-auto p-4 sidebar-nav-desktop">
           <ul className="space-y-1.5">
             <li>
               <NavLink
