@@ -1,0 +1,13 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="32" height="32" rx="6" fill="#1e3a5f"/>
+  <!-- Seta para cima (crescimento/receitas) -->
+  <path d="M16 6L20 10H18V18H14V10H12L16 6Z" fill="white" opacity="0.95"/>
+  <!-- Linha base do gráfico -->
+  <path d="M6 26L26 26" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <!-- Pontos do gráfico -->
+  <circle cx="9" cy="23" r="1.5" fill="white"/>
+  <circle cx="16" cy="20" r="1.5" fill="white"/>
+  <circle cx="23" cy="17" r="1.5" fill="white"/>
+  <!-- Linha do gráfico -->
+  <path d="M9 23L16 20L23 17" stroke="white" stroke-width="2" stroke-linecap="round" fill="none"/>
+</svg>

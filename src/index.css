@@ -1,0 +1,588 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  /* Scrollbars visíveis com destaque */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--primary)) hsl(var(--muted));
+    -ms-overflow-style: auto;
+  }
+  
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  
+  *::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+    border-radius: 999px;
+  }
+  
+  *::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  
+  *::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  /* Mobile optimizations */
+  @media (max-width: 768px) {
+    body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    * {
+      scrollbar-width: thin;
+    }
+    
+    *::-webkit-scrollbar {
+      width: 12px;
+      height: 12px;
+    }
+    
+    *::-webkit-scrollbar-thumb {
+      box-shadow: 0 0 0 2px hsl(var(--background)) inset;
+    }
+    
+    /* Better touch targets */
+    button, a, [role="button"] {
+      min-height: 44px;
+      min-width: 44px;
+    }
+    
+    /* Prevent text selection on buttons */
+    button {
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    
+  }
+
+  /* Fix for sonner toast user-select compatibility */
+  [data-sonner-toast][data-swiped=true] {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 215 25% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 215 25% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 25% 15%;
+
+    --primary: 217 91% 25%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 217 85% 88%;
+    --secondary-foreground: 217 91% 20%;
+
+    --muted: 215 20% 95%;
+    --muted-foreground: 215 15% 45%;
+
+    --accent: 217 91% 30%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    --border: 217 30% 85%;
+    --input: 217 30% 85%;
+    --ring: 217 91% 25%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 217 85% 12%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 217 90% 10%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 217 75% 25%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 217 70% 15%;
+    --sidebar-ring: 217 85% 30%;
+
+    --chart-1: 217 91% 25%;
+    --chart-2: 217 85% 35%;
+    --chart-3: 142 76% 36%;
+    --chart-4: 38 92% 50%;
+    --chart-5: 0 84% 60%;
+  }
+
+  .dark {
+    --background: 215 30% 8%;
+    --foreground: 0 0% 95%;
+
+    --card: 215 25% 12%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 215 25% 12%;
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 214 95% 45%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 215 25% 18%;
+    --secondary-foreground: 0 0% 95%;
+
+    --muted: 215 25% 18%;
+    --muted-foreground: 215 15% 60%;
+
+    --accent: 211 100% 45%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    --border: 215 25% 20%;
+    --input: 215 25% 20%;
+    --ring: 214 95% 50%;
+
+    --sidebar-background: 215 30% 10%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 214 95% 40%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 215 25% 18%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 215 25% 18%;
+    --sidebar-ring: 214 95% 50%;
+
+    --chart-1: 214 95% 45%;
+    --chart-2: 211 100% 55%;
+    --chart-3: 142 76% 40%;
+    --chart-4: 38 92% 55%;
+    --chart-5: 0 84% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html,
+  :host {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+}
+
+@layer utilities {
+  .shadow-elegant {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.08);
+  }
+  
+  .shadow-elegant-lg {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.08);
+  }
+  
+  .shadow-elegant-xl {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  }
+
+  .gradient-primary {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.9) 100%);
+  }
+
+  .gradient-success {
+    background: linear-gradient(135deg, hsl(var(--success)) 0%, hsl(var(--success) / 0.9) 100%);
+  }
+
+  .gradient-warning {
+    background: linear-gradient(135deg, hsl(var(--warning)) 0%, hsl(var(--warning) / 0.9) 100%);
+  }
+
+  .gradient-card {
+    background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card) / 0.98) 100%);
+    border: 1px solid hsl(var(--border) / 0.5);
+  }
+
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .gradient-modern {
+    background: linear-gradient(135deg, hsl(var(--primary) / 0.1) 0%, hsl(var(--primary) / 0.05) 100%);
+  }
+
+  .border-modern {
+    border: 1px solid hsl(var(--border) / 0.6);
+    box-shadow: 0 0 0 1px hsl(var(--border) / 0.3) inset;
+  }
+
+  .hover-lift {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+  }
+
+  .icon-3d {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.06));
+  }
+
+  .icon-glow {
+    filter: drop-shadow(0 0 8px currentColor);
+  }
+
+  .icon-professional {
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1)) drop-shadow(0 0 1px rgba(0, 0, 0, 0.05));
+  }
+
+  /* Melhorias avançadas de tipografia para formulários - UX Design Premium */
+  .form-section {
+    padding: 1.75rem 0;
+    border-bottom: 1px solid hsl(var(--border) / 0.4);
+    margin-bottom: 1.5rem;
+  }
+
+  .form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+
+  /* Labels premium - melhor hierarquia visual */
+  label {
+    letter-spacing: 0.03em;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: hsl(var(--foreground) / 0.95);
+    display: block;
+    margin-bottom: 0.5rem;
+    text-transform: none;
+  }
+
+  /* Agrupamento visual de campos */
+  .form-group {
+    background: hsl(var(--muted) / 0.3);
+    border: 1px solid hsl(var(--border) / 0.5);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.2s ease;
+  }
+
+  .form-group:hover {
+    border-color: hsl(var(--border) / 0.8);
+    background: hsl(var(--muted) / 0.4);
+  }
+
+  /* Melhor espaçamento entre campos */
+  .space-y-2 > * + * {
+    margin-top: 0.75rem;
+  }
+
+  .space-y-2.5 > * + * {
+    margin-top: 0.875rem;
+  }
+
+  .space-y-4 > * + * {
+    margin-top: 1.5rem;
+  }
+
+  .space-y-5 > * + * {
+    margin-top: 1.75rem;
+  }
+
+  .space-y-6 > * + * {
+    margin-top: 2rem;
+  }
+
+  /* Inputs premium - estados visuais aprimorados */
+  input:not(:disabled):not(:read-only),
+  textarea:not(:disabled):not(:read-only),
+  select:not(:disabled) {
+    background: hsl(var(--background));
+    border-color: hsl(var(--input) / 0.7);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  input:hover:not(:disabled):not(:read-only),
+  textarea:hover:not(:disabled):not(:read-only),
+  select:hover:not(:disabled) {
+    border-color: hsl(var(--input) / 1);
+    background: hsl(var(--background));
+  }
+
+  /* Focus state premium */
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    border-color: hsl(var(--primary)) !important;
+    box-shadow: 
+      0 0 0 3px hsl(var(--primary) / 0.12),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06),
+      0 4px 6px -1px rgba(0, 0, 0, 0.04) !important;
+    outline: none;
+    transform: translateY(-1px);
+  }
+
+  /* Placeholder premium */
+  input::placeholder,
+  textarea::placeholder {
+    opacity: 0.55;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+  }
+
+  /* Estados de validação visual */
+  input:valid:not(:placeholder-shown),
+  textarea:valid:not(:placeholder-shown) {
+    border-color: hsl(var(--success) / 0.5);
+  }
+
+  input:invalid:not(:placeholder-shown):not(:focus),
+  textarea:invalid:not(:placeholder-shown):not(:focus) {
+    border-color: hsl(var(--destructive) / 0.6);
+  }
+
+  /* Disabled state melhorado */
+  input:disabled,
+  textarea:disabled,
+  select:disabled {
+    background: hsl(var(--muted) / 0.5);
+    border-color: hsl(var(--border) / 0.5);
+    color: hsl(var(--muted-foreground) / 0.7);
+    cursor: not-allowed;
+  }
+
+  /* Melhorias visuais para grupos de campos relacionados */
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  /* Refinamento de tipografia para textos de ajuda */
+  .text-xs.text-muted-foreground {
+    font-size: 0.75rem;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+    opacity: 0.75;
+  }
+
+  /* Melhor separação visual entre seções do formulário */
+  .form-divider {
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      hsl(var(--border) / 0.5),
+      transparent
+    );
+    margin: 1.5rem 0;
+  }
+
+  /* Animação sutil para campos ao aparecer */
+  @keyframes fieldFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .form-field {
+    animation: fieldFadeIn 0.3s ease-out;
+  }
+
+  /* Contorno alternado para linhas de tabela */
+  .row-border-alternate {
+    border: 2px solid hsl(var(--primary)) !important;
+    border-radius: 6px;
+    margin: 2px 0;
+    border-bottom: 2px solid hsl(var(--primary)) !important;
+  }
+  
+  .row-border-none {
+    border: 2px solid transparent !important;
+    border-bottom: 1px solid hsl(var(--border)) !important;
+  }
+
+  /* Hover azul para linhas da tabela - otimizado */
+  .row-border-alternate:hover,
+  .row-border-none:hover {
+    background-color: hsl(var(--primary) / 0.1) !important;
+    border-color: hsl(var(--primary)) !important;
+    cursor: pointer;
+  }
+
+  /* Hover azul para cards do dashboard - otimizado */
+  .dashboard-card:hover {
+    background-color: hsl(var(--primary) / 0.05) !important;
+    border-color: hsl(var(--primary)) !important;
+    cursor: pointer;
+  }
+
+  .stats-card:hover {
+    background-color: hsl(var(--primary) / 0.08) !important;
+    border-color: hsl(var(--primary)) !important;
+    cursor: pointer;
+  }
+
+  /* Remove hover e active effects dos submenus */
+  .sidebar-submenu a {
+    transition: none !important;
+  }
+
+  .sidebar-submenu a:hover {
+    background-color: transparent !important;
+    color: hsl(var(--sidebar-foreground) / 0.8) !important;
+  }
+
+  .sidebar-submenu a.active,
+  .sidebar-submenu a[aria-current="page"] {
+    background-color: transparent !important;
+    color: hsl(var(--sidebar-foreground) / 0.8) !important;
+    font-weight: 400 !important;
+  }
+
+  /* Otimização de performance para Collapsible */
+  [data-radix-collapsible-content] {
+    will-change: auto;
+  }
+
+  [data-radix-collapsible-content][data-state="open"] {
+    animation: none !important;
+  }
+
+  /* Animação de pulso suave para cards */
+  @keyframes pulse-card {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    50% {
+      transform: scale(1.02);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+  }
+
+  .animate-pulse-card {
+    animation: pulse-card 2s ease-in-out infinite;
+  }
+
+  /* Animação de pulso para ícone de alerta */
+  @keyframes pulse-alert {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 0.9;
+    }
+  }
+
+  .animate-pulse-alert {
+    animation: pulse-alert 1.5s ease-in-out infinite;
+  }
+
+  /* Scroll aware container + sombras */
+  .scroll-aware-wrapper {
+    position: relative;
+  }
+
+  .scroll-aware-content {
+    position: relative;
+  }
+
+  .scroll-shadow {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 10;
+  }
+
+  @media (max-width: 768px) {
+    .scroll-shadow-left,
+    .scroll-shadow-right {
+      top: 0;
+      bottom: 0;
+      width: 32px;
+      background: linear-gradient(90deg, hsl(var(--background)), transparent);
+    }
+
+    .scroll-shadow-left {
+      left: 0;
+    }
+
+    .scroll-shadow-right {
+      right: 0;
+      transform: scaleX(-1);
+    }
+
+    .scroll-shadow-top,
+    .scroll-shadow-bottom {
+      left: 0;
+      right: 0;
+      height: 24px;
+      background: linear-gradient(180deg, hsl(var(--background)), transparent);
+    }
+
+    .scroll-shadow-top {
+      top: 0;
+    }
+
+    .scroll-shadow-bottom {
+      bottom: 0;
+      transform: scaleY(-1);
+    }
+
+    .scroll-aware-wrapper[data-has-horizontal="true"] .scroll-shadow-left,
+    .scroll-aware-wrapper[data-has-horizontal="true"] .scroll-shadow-right,
+    .scroll-aware-wrapper[data-has-vertical="true"] .scroll-shadow-top,
+    .scroll-aware-wrapper[data-has-vertical="true"] .scroll-shadow-bottom {
+      opacity: 0.85;
+    }
+
+    .scroll-shadow[data-active="false"] {
+      opacity: 0;
+    }
+  }
+}
